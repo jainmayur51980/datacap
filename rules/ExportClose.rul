@@ -1,0 +1,28 @@
+<ruleset name="ExportClose" id="17" ver="1">
+	<rule name="Close TExt File Rule" id="1">
+		<func name="CLose Text File Function">
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="&lt;/B&gt;" name="StrParam"/>
+			</a>
+			<a name="CloseExportFile" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="OpenConnection" ns="Lookup">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Update Fingerprint Statistics" id="2">
+		<func name="Function1">
+			<a name="UpdateFPStats" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

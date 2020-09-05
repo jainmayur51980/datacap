@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="POLR" id="26" ver="6" modder="admin.1" dt="07/03/12 15:20:18.695 " src_ver="5" qi="">
+	<rule name="Page Level rule" id="1">
+		<func name="Function1">
+			<a name="CallPOLR" ns="POLR">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="FALSE,200" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Update PO Line Number" id="2" qi="">
+		<func name="Function1">
+			<a name="rrSet" ns="rrunner" qi="">
+				<p name="varSource" v="..\@F.PO Line Number"/>
+				<p name="varTarget" v="@F"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

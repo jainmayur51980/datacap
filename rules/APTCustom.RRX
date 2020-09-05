@@ -1,0 +1,1063 @@
+﻿<?xml version='1.0' ?>
+<rrx namespace="APTCustom" v="8.1.0.2"><i ref="rrunner"/><i ref="APT_Localization"/><g>
+  <![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2013 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------  
+  
+'*********************************
+'APT Custom Actions
+'APTCustom.rrx
+
+' Version
+'  8.0.0 - 04/5/2011   Tom Stuart
+'        - Adding actions to do calculations on machines that are localized.
+'
+'  8.0.2 - 02/16/2012   Tom Stuart
+'        - Added date conversion routines
+'
+'  8.1.0 - 02/16/2012   Tom Stuart
+'        - Added include for APT_Localization to fix Sticky Fingerprint issue.
+'
+'  8.1.0.1 - 06/05/2012
+'        - cleared the position of the main tax field.
+'
+'  8.1.0.2 - 02/12/2013 PHofle
+'        - Fixed unhandled errors when converting date value '10/22/201' to Date type.
+'          wk#36002
+'
+Version = "8.1.0.3"
+'        - 11/12/2013 RFerin
+'        - 70061 Marked actions as deprecated updated help with info about global action that should be used instead. 
+'        - ConvertEuroDateToUS, ConvertUSDateToEuro, IsDate_FormatEuro, MakeFieldHighConfidence, ClearCurrentField
+'        - PopulateTaxType first checks values/gen/SettingsFile and if not found, looks for the legacy value.
+'        - Added help text.
+'
+Writelog("APTCustom Actions " & Version)
+'*********************************
+
+]]></g>
+
+<f name="CalculateLineItemLocalized" access="public" qi="Determines if the LineTotal field is correct.">
+  <p name="Tolerance"/>
+  <ap>
+     The floating point tolerance value that will be used to determine if the LineTotal matches the Qty * Price within the tolerance.<br/>
+  </ap>
+  <h>
+    Determines if the fields "Qty * Price = LineTotal" within 
+    the specified tolerance value.<br/><br/>
+    <e>
+      IsFieldCurrency()<br/>
+      <b>CalculateInvoiceTotalLocalized("0.02")</b><br/>
+    </e>
+  </h>
+  <lvl>
+     Must be called on the LineTotal field.
+  </lvl>
+  <ret>
+    <b>False</b> if the Qty, Price or LineTotal fields do not contain a numeric value.<br/>
+    <b>True</b> if the Qty * Price matches the LineTotal value within the specified tolerance.  Otherwise, <b>False.</b>
+  </ret>
+  <g>
+  <![CDATA[
+    ' When CalculateFields supports any locale, this action will not be needed.
+    Dim Qty
+    Dim Price
+
+    CalculateLineItemLocalized = False
+    
+    Set Qty = Nothing
+    Set Price = Nothing
+
+    Set Qty = CurrentObj.Parent.FindChild("Qty")
+    Set Price = CurrentObj.Parent.FindChild("Price")
+
+    if Qty Is Nothing then
+       Writelog("Could not find Qty")
+       Exit Function
+    end if
+    
+    if Price Is Nothing then
+       Writelog("Could not find Price")
+       Exit Function
+    end if
+  
+    Writelog("Qty:" & Qty.Text)
+    Writelog("Price:" & Price.Text)
+    Writelog("LineTotal:" & CurrentObj.Text)    
+   
+    if not IsNumeric(Qty.Text) then
+       Writelog("Quantity was not numeric: " & Qty.Text & "  Exiting")
+       Exit Function
+    end if
+
+    if not IsNumeric(Price.Text) then
+       Writelog("Price was not numeric: " & Price.Text & "  Exiting")
+       Exit Function
+    end if
+
+    if not IsNumeric(CurrentObj.Text) then
+       Writelog("LineTotal was not numeric: " & CurrentObj.Text & "  Exiting")
+       Exit Function
+    end if
+
+    Dim slocale  ' NormalizeNumber allows the input to be have a decimal or comma separator and will adjust for the locale so the action works in any locale.
+    slocale = DetermineLocale ' in rrunner
+    Tolerance = DCGlobalCurrency.NormalizeNumber(Tolerance,slocale)
+
+    if not IsNumeric(Tolerance) then
+       Writelog("Tolerance was not numeric: " & Tolerance & "  Setting to 0")
+       Tolerance = 0.00
+    else   
+       Writelog("Tolerance = " & Tolerance)
+    end if
+
+    if (cDbl(CurrentObj.Text) >= (cDbl(Qty.Text) * cDbl(Price.Text)) - cDbl(Tolerance)) AND (cDbl(CurrentObj.Text) <= (cDbl(Qty.Text) * cDbl(Price.Text)) + cDbl(Tolerance))  then
+         CalculateLineItemLocalized = TRUE
+    else
+         Writelog("Math was inaccurate")         
+    end if 
+  ]]>
+  </g>
+</f>
+
+<f name="CalculateInvoiceTotalLocalized" access="public" qi="Determines if the Total field is within the tolerance for the data on the page.">
+  <p name="Tolerance"/>
+  <ap>
+    The floating point tolerance value that will be used to determine if the Tax, Shipping and Detail values equal the Total within the tolerance.<br/><br/>
+  </ap>
+  <h>
+    Uses the Details, Tax and Shipping fields to calculate the total value and checks to see if it matches the Total field within
+    the specified tolerance.<br/>
+    <e>
+      IsFieldCurrency()<br/>
+      <b>CalculateInvoiceTotalLocalized("0.02")</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Must be called on the invoice total field.
+  </lvl>
+  <ret>    
+    <b>True</b> if the Details, Tax and Shipping fields add up to the Total field value within the specified tolerance.  Otherwise, <b>False.</b>
+  </ret>
+  <g>
+  <![CDATA[
+    ' When CalculateFields supports any locale, this action will not be needed.
+    Dim LineItems
+    Dim Tax
+    Dim Shipping
+    Dim oDetails
+    Dim oLine
+
+    CalculateInvoiceTotalLocalized = False
+    
+    Dim slocale  ' NormalizeNumber allows the input to be have a decimal or comma separator and will adjust for the locale so the action works in any locale.
+    slocale = DetermineLocale ' in rrunner
+    Tolerance = DCGlobalCurrency.NormalizeNumber(Tolerance,slocale)
+
+    if not IsNumeric(Tolerance) then
+       Writelog("Tolerance was not numeric: " & Tolerance & "  Setting to 0")
+       Tolerance = 0.00
+    else   
+       Writelog("Tolerance = " & Tolerance)
+    end if
+
+    if Not IsNumeric(CurrentObj.Text) then
+        Writelog("Field must contain a numeric value: " & CurrentObj.Text)
+        Exit Function
+    End if
+
+    
+    Set Qty = Nothing
+    Set Price = Nothing
+    Set oDetails = Nothing
+
+    Set Tax = CurrentObj.Parent.FindChild("Tax")
+    Set Shipping = CurrentObj.Parent.FindChild("Shipping")
+    Set oDetails = CurrentObj.Parent.FindChild("Details")
+
+    if Tax Is Nothing then
+       Writelog("Could not find Tax. Exiting.")
+       Exit Function
+    end if
+    
+    if Shipping Is Nothing then
+       Writelog("Could not find Shipping. Exiting.")
+       Exit Function
+    end if
+    
+    if oDetails Is Nothing then
+       Writelog("Could not find Details. Exiting.")
+       Exit Function
+    end if
+
+    Dim i
+    LineItems = cDbl(0)
+
+    For i = 0 to oDetails.NumOfChildren - 1
+       Set oLine = oDetails.GetChild(i)
+
+       if IsNumeric(oLine.FindChild("LineTotal").Text) then
+          LineItems = cDbl(LineItems + cDbl(oLine.FindChild("LineTotal").Text)) 
+       end if
+       
+    next
+
+    Writelog("Tax:" & Tax.Text)
+    Writelog("Shipping:" & Shipping.Text)
+    Writelog("LineTotal:" & LineItems)
+
+    if Not IsNumeric(Shipping.Text) then
+       Writelog("Shipping is not numeric.  Defaulting to 0.00")
+       ShipVal = 0.00
+    else
+       ShipVal = cDbl(Shipping.Text)
+    end if
+
+    if Not IsNumeric(Tax.Text) then
+       Writelog("Tax is not numeric.  Defaulting to 0.00")
+       TaxVal = 0.00
+    else
+       TaxVal = cDbl(Tax.Text)
+    end if
+
+    if Not IsNumeric(LineItems) then
+       Writelog("LineItems is not numeric.  Defaulting to 0.00")
+       LineItems = 0.00
+    End if  
+
+    Writelog("Invoice Total: " & CurrentObj.Text)
+    Writelog("Calculated totals: " & cDBL(LineItems + ShipVal + TaxVal))
+
+    If cDbl(CurrentObj.Text) > cDbl(LineItems + ShipVal + TaxVal - cDbl(Tolerance)) AND cDbl(CurrentObj.Text) < cDbl(LineItems + ShipVal + TaxVal + cDbl(Tolerance))  then
+        CalculateInvoiceTotalLocalized = TRUE
+    else
+         Writelog("Math was inaccurate")
+    End if  
+  ]]>
+  </g>
+</f>
+
+<f name="MakeFieldHighConfidence" access="public" qi="Sample starter RRX Library">
+  <p name="FieldName"/>
+  <ap>   
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.  Instead, use the DCO
+    action SetFldConfidence. For example: <br/><br/>
+
+    SetFldConfidence("@P\LineTotal,10")<br/>
+    See the action help for details.<br/><br/><br/>
+  </h>
+  <lvl>
+  </lvl>
+  <ret>
+    <br/>
+  </ret>
+  <g>
+  <![CDATA[
+     MakeFieldHighConfidence= TRUE
+ 
+      Dim oField
+     
+      Set oField = Nothing
+      Set oField = CurrentObj.Parent.FindChild(FieldName)
+
+      if oField is Nothing then
+           Writelog("Field was not found, Exiting")
+           Exit Function
+     End if
+     oField.ConfidenceString = ""
+     NewConfString = ""
+     For i = 1 to len(oField.Text)
+           NewConfString = NewConfString & "9"
+     Next 'i
+     oField.ConfidenceString = NewConfString
+     Writelog(oField.ID & " confidence string set to " & oField.ConfidenceString)
+  ]]>
+  </g>
+</f>
+
+<f name="ClearCurrentField" access="public" qi="Clears the current field">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.  Instead, use the Rrunner
+    action rrSet.  For example: <br/><br/>
+
+    rrSet(@EMPTY,@F)<br/>    
+    See the action help for details.<br/><br/><br/>
+
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    Erases the data in the current field<br/>
+    <e>
+      <b>ClearCurrentField()</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Field level only.
+  </lvl>
+  <ret>
+    Always <b>TRUE.</b> 
+  </ret>
+  <g>
+  <![CDATA[
+     ClearCurrentField = TRUE
+     
+     CurrentObj.Text = ""
+     Writelog("CurrentObj.Text set to: " & CurrentObj.Text)
+     
+  ]]>
+  </g>
+</f>
+  
+<f name="IsDate_FormatEuro" access="public" qi="Checks to see if date is valid Euro format">
+  <ap>
+   None
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.  Instead, use the Validation
+    action IsFieldDate which will validate the date based on the current locale.  
+    If needed, the locale can be specified that
+    matches the source date format so it can be validated based on that locale's default short date format.  
+    For example: <br/><br/>
+
+    rrSet("en-GB", "@F.hr_locale")<br/>
+    IsFieldDateWithReformat("YYYY\MM\DD")<br/>
+    See the action help for details.<br/><br/><br/>    
+  </h>
+  <lvl>
+      Field Level only.
+  </lvl>
+  <ret>
+    True if a valid Euro format.  Othewise, False.
+  </ret>
+  <g>
+  <![CDATA[
+
+    On Error Resume Next
+
+    IsDate_FormatEuro = FALSE
+
+    if Not IsDate(CurrentObj.Text) then
+        Writelog("Field must contain a valid date.  Exiting")
+        Exit Function
+    End if
+
+    CurrentObj.Text = FormatDateTime(CurrentObj.Text,2)
+    Writelog("CurrentObj current text: " & CurrentObj.Text)
+    Dt = cDate(CurrentObj.Text)
+     
+    If Err.Number<>0 then
+       Err.Clear
+       Writelog("Field must contain a valid date.  Exiting")
+       Exit Function
+    End if
+     
+    MonthStr = Right("00" & Month(Dt),2)
+    DayStr = Right("00" & Day(DT),2)
+
+    CurrentObj.Text = Year(Dt) & "/" & MonthStr & "/" & DayStr  
+    Writelog("Formatted date: " & CurrentObj.Text)
+
+    IsDate_FormatEuro = TRUE 
+  ]]>
+  </g>
+</f>
+
+<f name="AddToDate" access="public" qi="Increments the field date by the number of hours specified in the parameter.">
+  <p name="Hours"/>
+  <ap>
+     The number of hours to add to the date value.<br/>
+  </ap>
+  <h>
+     Adds the number of hours to the date specified in the current field.
+     The field must contain a valid date in the format that matches the default Gregorian short
+     date format for the current locale.<br/><br/>
+    <e>
+      <b>AddToDate("24")</b><br/>
+      Increments the current date by one day.
+    </e>
+  </h>
+  <lvl>
+      Field level.
+  </lvl>
+  <ret>
+    Always <b>True</b>.
+  </ret>
+  <g>
+  <![CDATA[
+
+   AddToDate = TRUE       'Actions must always return a TRUE or FALSE.
+
+   if CurrentObj.ObjectType <> 3 then 
+       Writelog("Action only runs on a field object.  Exiting")
+       Exit Function
+   end if
+
+   if IsDate(CurrentObj.Text) then
+       Writelog("Attempting to add " & Hours & " to " & CurrentObj.Text)
+       CurrentObj.Text = cStr( DateAdd("h",cLng(Hours),CurrentObj.Text))
+       Writelog("New value: " & CurrentObj.Text)
+   else
+        Writelog("The current object did not contain a vaild date value")
+   end if
+ 
+  ]]>
+  </g>
+</f>
+
+<f name="PopulateTaxType" access="public" qi="Loads the search terms for the Taxes field.">
+  <ap>
+    None.<br/>
+  </ap>
+  <h>
+    Reads the "TaxTypes" values listed in the APT settings file specified in the Application Manager key values/gen/SettingsFile.
+    It is expected that there is a *.key file for each listed type.  The key file is a plain text file that contains
+    strings that will be used to locate the tax field on the page.<br/><br/>
+    
+    This action is for APT and not intended for general use.<br/>
+    <e>
+      <b>PopulateTaxType()</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Field Level.  The Taxes field in APT.
+  </lvl>
+  <ret>
+    Always <b>TRUE.</b>
+  </ret>
+  <g>
+  <![CDATA[
+     PopulateTaxType= TRUE
+
+     SettingsFile= MetaWord("@APPVAR(values/gen/SettingsFile)") ' First check a standard location that is editable in Application Manager GUI.
+     if (SettingsFile = "") Then
+         SettingsFile= MetaWord("@APPPATH(settingsfile)")  ' Use legacy location if value is not found in General variable location.  This ini specification can only be changed by manually editing the app file.
+     End If
+     Writelog("Settings File: " & SettingsFile)
+
+     retn = Pilot.GetProfileString("Tax Field","TaxTypes","*",SettingsFile)
+     Writelog("Retn= " & retn)
+     if retn = "*" then 
+         Writelog("Error in reading entries from settings file.  Exiting")
+         Exit Function
+     end if
+      
+     Dim TaxAr
+     Dim oTaxLineitem
+     Dim oTaxType
+     Dim oTaxValue
+     
+     TaxAr = SPLIT(retn,",") ' Split up the TaxTypes read out of the INI file.
+      
+     if CurrentObj.NumOfChildren <> 0 then
+           Writelog("Tax children exist.  Exiting")
+           Exit Function
+     end if     
+
+     For i = 0 to uBound(TaxAr)
+          Writelog("Creating children for: " & TaxAr(i))
+           
+          Set oTaxLineitem = CurrentObj.AddChild("3","TaxLineitem" & cStr(i+1),i)
+          oTaxLineitem.Type = "TaxLineitem"
+          oTaxLineitem.Status = 0
+          oTaxLineitem.Variable("Position") = "0,0,0,0"
+          Set oTaxType = oTaxLineitem.AddChild("3","Tax_Type",0)
+          oTaxType.Type = "Tax_Type"
+          oTaxType.Text = TaxAr(i)
+          oTaxType.Status = 0
+          oTaxType.Variable("Position") = "0,0,0,0"
+          Set oTaxValue = oTaxLineitem.AddChild("3","Tax_Value",1)
+          oTaxValue.Type = "Tax_Value" 
+          oTaxValue.Status = 0
+          oTaxValue.Variable("Position") = "0,0,0,0"
+     Next 'i     
+  ]]>
+  </g>
+</f>
+
+<f name="FindTaxValue" access="public" qi="Attempts to locate the value for the Tax_Value field.">
+  <ap>
+    None.<br/>
+  </ap>
+  <h>
+    Attempts to locate the value for the Tax_Value field.<br/><br/>
+    This action is for APT and not intended for general use.<br/>
+    <e>
+      <b>FindTaxValue()</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Field level. The Tax_Value field in APT.
+  </lvl>
+  <ret>
+    Always <b>TRUE.</b>
+  </ret>
+  <g>
+  <![CDATA[
+     FindTaxValue= TRUE
+
+     Dim oField
+     Set oField = Nothing
+     Set oField = CurrentObj.Parent.FindChild("Tax_Type")
+
+      if oField is Nothing then
+             Writelog("Cannot find the Tax_Type field.  Exiting")
+              Exit Function
+      end if
+
+      if FindLastKeyList(false,false,oField.Text) then
+         Call GoRightWord(false,false,"1")
+         Call UpdateField(false,false)
+         Call AllowOnlyChars(false,false,"0123456789,.")
+         Call ConvertToLocalDecimal()
+         if IsNumeric(CurrentObj.Text) then
+            Writelog("Found value: " & CurrentObj.Text)
+            Exit Function
+         else
+             Writelog("Did not find value with GoRightWord(1)")
+        end if
+
+        Call GoRightWord(false,false,"1")
+        Call UpdateField(false,false)
+        Call AllowOnlyChars(false,false,"0123456789,.")
+        Writelog("Calling ConvertToLocalDecimal")
+        Call ConvertToLocalDecimal()
+        Writelog("Returned from ConvertToLocalDecimal")
+        if IsNumeric(CurrentObj.Text) then
+           Writelog("Found value: " & CurrentObj.Text)
+           Exit Function
+        else
+           Writelog("Did not find value with GoRightWord(2)")
+        end if
+      else
+         Writelog("Did not find keyword.  Exiting")
+         Exit Function
+      end if
+
+      Call FindLastKeyList(false,false,oField.Text)
+      Call GoBelowWord(false,false,"1")
+      Call UpdateField(false,false)
+      Call AllowOnlyChars(false,false,"0123456789,.")
+      Call ConvertToLocalDecimal()
+      if IsNumeric(CurrentObj.Text) then
+            Writelog("Found value: " & CurrentObj.Text)
+            Exit Function
+      else
+             Writelog("Did not find value with GoBelowWord(1)")
+      end if
+  
+  ]]>
+  </g>
+</f>
+
+<f name="AddAllTaxesToTaxField" access="public" qi="Adds all tax values from detail structure into Tax field.">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    Adds all tax values from detail structure into Tax field.<br/><br/>
+
+    This action is for APT and not intended for general use.<br/>
+    <e>
+      <b>AddAllTaxesToTaxField()</b>
+    </e>
+  </h>
+  <lvl>
+      The close event of TaxLineItem in APT.
+  </lvl>
+  <ret>
+    Always <b>True.</b> <br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+    Dim oLineItem
+    Dim oTaxValue
+    Dim oTaxField
+
+    AddAllTaxesToTaxField = TRUE
+
+    Set oTaxField = Nothing
+    Set oTaxField = CurrentObj.Parent.FindChild("Tax")
+    if oTaxField Is Nothing then
+       Writelog("Could not find Tax field.  Exiting")
+       Exit Function
+    end if
+
+    TaxTotal = 0.00
+    For i = 0 to CurrentObj.NumOfChildren - 1
+       Set oLineItem = CurrentObj.GetChild(i)
+       Set oTaxValue = Nothing
+       Set oTaxValue = oLineItem.FindChild("Tax_Value")
+       if oTaxValue Is Nothing then
+          Writelog("Tax_Value field was not found.  Exiting")
+          Exit Function
+       else
+          if TRIM(oTaxValue.Text) <> "" then
+             if IsNumeric(oTaxValue.Text) then
+                Writelog("Adding: " & oTaxValue.Text)
+                TaxTotal = TaxTotal + cDbl(oTaxValue.Text)
+             else
+                 Writelog("Found non-numeric value: " & oTaxValue.Text & "   Exiting")
+                Exit Function
+             end if
+          end if
+
+       end if     
+       TaxTotalStr = cStr(FormatCurrency(TaxTotal,2,-1))
+  
+       oTaxField.Text = TaxTotalStr  
+       Writelog("Setting tax field to: " & oTaxField.Text)
+    Next 'i  
+    oTaxField.Variable("Position")= "0,0,0,0"
+  ]]>
+  </g>
+</f>
+
+<f name="IsInvoiceFromUS" access="public" qi="Checks to see if the postal code follows a US format.">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    Checks to see if the postal code follows a US format.  If the format of the ZIP
+    fits a US format, then it assumes the document is of US origin.<br/><br/>
+
+    This action is for APT and not intended for general use.<br/>
+    <e>
+      <b>IsInvoiceFromUS()</b>
+    </e>
+  </h>
+  <lvl>
+      Page level.
+  </lvl>
+  <ret>
+    Returns <b>True</b> if the test for a US ZIP code format passes, otherwise <b>False.</b><br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+     IsInvoiceFromUS = FALSE
+
+     Dim oField
+
+     Set oField = Nothing
+     Set oField = CurrentObj.Parent.FindChild("Remittance_Zip")
+
+     if oField Is Nothing then
+        Writelog("Unable to find the Remittance_Zip field.  Exiting FALSE")
+        Exit Function
+     end if
+
+     PostalCode = oField.Text
+     
+     if TRIM(PostalCode) = "" then
+        Writelog("Postal code was blank.  Exiting FALSE")
+        Exit Function
+     end if
+
+     if len(PostalCode) = 5 AND IsNumeric(PostalCode) then    '5 digit US zip
+        IsInvoiceFromUS = TRUE
+        Exit Function
+     end if
+
+     if len(PostalCode) = 9 AND IsNumeric(PostalCode) then    '9 digit US zip
+        IsInvoiceFromUS = TRUE
+        Exit Function
+     end if
+   
+     if len(PostalCode) = 10 AND Mid(PostalCode,6,1) = "-" then    'Zip + 4 digit US zip
+        if IsNumeric(Right(PostalCode,4)) and IsNumeric(Left(PostalCode,5)) then
+           IsInvoiceFromUS = TRUE
+           Exit Function
+        end if
+     end if   
+  ]]>
+  </g>
+</f>
+
+<f name="ConvertEuroDateToUS" access="public" qi="Converts Euro Dates to US format">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.  Instead, use the Validation
+    action IsFieldDateWithReformat.  You can specify a locale that
+    matches the source date format so it can be converted to a US format.  For example: <br/><br/>
+    
+    rrSet("en-GB", "@F.hr_locale")<br/>
+    IsFieldDateWithReformat("YYYY\MM\DD")<br/>
+    See the action help for details.<br/><br/><br/>
+
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    Converts a Euro Date format to US format.<br/>
+    <e>
+       
+    </e>
+  </h>
+  <lvl>
+      Field Level only.
+  </lvl>
+  <ret>
+    False if date is invalid, otherwise, True. <br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+     On Error Resume Next
+
+     ConvertEuroDateToUS = True
+
+     CurrentLocale = GetLocale()
+     Writelog("Current field value: " & CurrentObj.Text)
+     Writelog("Current Locale: " & CurrentLocale)
+     
+     Call SetLocale("2057")
+     Writelog("Set Locale to 2057")
+     if IsDate(CurrentObj.Text) then
+        Writelog("Valid date found")
+        Dt = cDate(CurrentObj.Text)
+        'Writelog("Date value: " & cStr(DateValue))
+        If Err.Number<>0 then
+          Err.Clear
+          Writelog("Field must contain a valid date.  Exiting")
+          ConvertEuroDateToUS = False
+          Call SetLocale(CurrentLocale)
+          Writelog("Locale set back to: " & CurrentLocale)
+          Exit Function
+        End if
+     else
+        Writelog("Not a valid date.  Exiting FALSE")
+        Call SetLocale(CurrentLocale)
+        Writelog("Locale set back to: " & CurrentLocale)
+        ConvertEuroDateToUS = FALSE
+        exit function
+     end if
+
+     Call SetLocale(CurrentLocale)
+     Writelog("Locale set back to: " & CurrentLocale)
+
+     CurrentObj.Text = FormatDateTime(Dt,2)
+     Writelog("Field value converted to: " & CurrentObj.Text)
+  ]]>
+  </g>
+</f>
+
+<f name="ConvertUSDateToEuro" access="public" qi="Converts US Dates to Euro format">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.  Instead, use the Validation
+    action IsFieldDateWithReformat.  You can specify a locale that
+    matches the source date format so it can be converted to a US format.  For example: <br/><br/>
+
+    rrSet("en-US", "@F.hr_locale")<br/>
+    IsFieldDateWithReformat("YYYY\MM\DD")<br/>
+    See the action help for details.<br/><br/><br/>
+
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    Converts a US Date format to Euro format.<br/>
+    <e>
+       
+    </e>
+  </h>
+  <lvl>
+      Field Level only.
+  </lvl>
+  <ret>
+    False if date is invalid, otherwise, True. <br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+     On Error Resume Next
+
+     ConvertUSDateToEuro = True
+
+     CurrentLocale = GetLocale()
+     Writelog("Current field value: " & CurrentObj.Text)
+     Writelog("Current Locale: " & CurrentLocale)
+     
+     Call SetLocale("1033")
+     Writelog("Set Locale to 1033")
+     if IsDate(CurrentObj.Text) then
+        Writelog("Valid date found")
+        Dt = cDate(CurrentObj.Text)
+        'Writelog("Date value: " & cStr(DateValue))
+        If Err.Number<>0 then
+          Err.Clear
+          Writelog("Field must contain a valid date.  Exiting")
+          ConvertUSDateToEuro = False
+          Call SetLocale(CurrentLocale)
+          Writelog("Locale set back to: " & CurrentLocale)
+          Exit Function
+        End if
+     else
+        Writelog("Not a valid date.  Exiting FALSE")
+        Call SetLocale(CurrentLocale)
+        Writelog("Locale set back to: " & CurrentLocale)
+        ConvertUSDateToEuro=FALSE
+        exit function
+     end if
+
+     Call SetLocale(CurrentLocale)
+     Writelog("Locale set back to: " & CurrentLocale)
+
+     CurrentObj.Text = FormatDateTime(Dt,2)
+     Writelog("Field value converted to: " & CurrentObj.Text)
+  ]]>
+  </g>
+</f>
+
+<f name="SaveLineItemsToPOLRDemoDB" access="public" qi="Saves demo line item data to POLR demo database">
+  <ap>
+   None.<br/>
+  </ap>
+  <h>
+    Saves PO records to demo POLR  database.  Do not use for production.<br/><br/>
+
+    This action is for APT and not intended for general use.<br/>
+    <e>
+      <b>SaveLineItemsToPOLRDemoDB()</b>
+    </e>
+  </h>
+  <lvl>
+      Lineitem field only.
+  </lvl>
+  <ret>
+    Always <b>True.</b><br/>
+  </ret>
+  <g>
+  <![CDATA[
+      Dim oRS
+      Dim oField
+
+     SaveLineItemsToPOLRDemoDB = True
+
+      if oConn.State <> 1 then
+         Writelog("Connection is not open.  Make sure the connection is opened with OpenConnection before proceeding.  Exiting.")
+      else
+          Writelog("Open connection found.  Attempting to add line items")
+      end if
+
+      'Checking to see if all fields exist.  If DCO is modified, the following code must be modified as well.
+
+      Set oField = Nothing
+      Set oField = CurrentObj.FindChild("ItemID")
+      if oField Is Nothing then
+          Writelog("ItemID field was not found.  Exiting")
+          Exit Function
+     else
+          ItemNo = oField.Text
+     end if
+  
+      Set oField = Nothing
+      Set oField = CurrentObj.FindChild("ItemDesc")
+      if oField Is Nothing then
+          Writelog("ItemDesc field was not found.  Exiting")
+          Exit Function
+     else
+          Description = oField.Text
+     end if
+  
+      Set oField = Nothing
+      Set oField = CurrentObj.FindChild("Qty")
+      if oField Is Nothing then
+          Writelog("Qty field was not found.  Exiting")
+          Exit Function
+     else
+          QTY = oField.Text
+     end if
+  
+      Set oField = Nothing
+      Set oField = CurrentObj.FindChild("Price")
+      if oField Is Nothing then
+          Writelog("Price field was not found.  Exiting")
+          Exit Function
+     else
+           UnitPrice = oField.Text
+     end if
+
+      Set oField = Nothing
+      Set oField = CurrentObj.FindChild("POLineNum")
+      if oField Is Nothing then
+          Writelog("POLineNum field was not found.  Exiting")
+          Exit Function
+     else
+          LineNo = oField.Text
+     end if
+  
+      Set oField = Nothing
+      Set oField = CurrentObj.Parent.Parent.FindChild("PO_Number")
+      if oField Is Nothing then
+          Writelog("PO Number field was not found.  Exiting")
+          Exit Function
+     else
+          PO = oField.Text
+          if Trim(PO) = "" then
+               Writelog("Unable to find a valid PO number.  Cannot set record in database.  Exiting")
+               Exit Function
+          end if
+     end if
+
+     if Trim(LineNo) = ""  then
+          LineNo = (CurrentObj.Parent.FindChildIndex(CurrentObj.ID) + 1) * 10
+          Writelog("POLineNum was missing.  Setting to: " & cStr(LineNo) )
+     end if
+
+     if Trim(UnitPrice) = "" then
+         UnitPrice = 0.00
+         Writelog("Price was missing.  Setting to 0.00")
+      end if
+
+      If Trim(QTY) = "" then
+          QTY = 1
+          Writelog("Qty was missing.  Setting to 1")
+      end if
+
+      sSQL1 = "Select * from POTable WHERE PO = '" & PO & "' AND ItemNo = '" & ItemNo & "';"
+      Writelog("sSQL1: " & sSQL1)
+
+     Set oRS = oConn.Execute(sSQL1)
+     Writelog("Execution successful")
+     if oRS.EOF or oRS.BOF then 
+         Writelog("Existing record was not found.  Attempting to insert")
+         sSQL2 = "INSERT INTO POTable (PO,QTY,ItemNo,Description,LineNo,UnitPrice) Values("
+         sSQL2 = sSQL2 & "'" & PO & "',"
+         sSQL2 = sSQL2 &  QTY & ","
+         sSQL2 = sSQL2 & "'" & ItemNo & "',"
+         sSQL2 = sSQL2 & "'" & Description & "',"
+         sSQL2 = sSQL2 & LineNo & ","
+         sSQL2 = sSQL2 &  UnitPrice & ");"
+         Writelog("sSQL2: " & sSQL2)
+         oConn.Execute(sSQL2)
+         Writelog("Record inserted successfully")
+     else
+          Writelog("Existing record was found.  Did not attempt insert")
+     end if     
+
+  ]]>
+  </g>
+</f>
+
+<f name="BackupCCO" access="public" qi="Makes a copy of the CCO of the first document page">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    <b>Copies the CCO file of the first document page to a file of the same name with a CC1 Extension.
+       This should be used prior to merging CCOs if you potentially want to restore the CCO later.</b>
+  </h>
+  <lvl>
+      Document Level only
+  </lvl>
+  <ret>
+    Always True. <br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+     On Error Resume Next
+
+     BackupCCO = True
+
+     Dim oFS
+
+     if CurrentObj.ObjectType <> 1 then
+        Writelog("Action will run at the document level only")
+        Exit Function
+     end if
+
+     Set oFS = CreateObject("Scripting.FileSystemObject")
+
+     SourceFile = Left(CurrentObj.GetChild(0).ImageName,Len(CurrentObj.GetChild(0).ImageName)-4) & ".cco"
+     DestinationFile = Left(CurrentObj.GetChild(0).ImageName,Len(CurrentObj.GetChild(0).ImageName)-4) & ".cc1"
+     Writelog("Copying file: " & SourceFile)
+     Writelog("To: " & DestinationFile)
+
+     if oFS.FileExists(SourceFile) then
+        Call oFS.CopyFile(SourceFile,DestinationFile)
+        Writelog("File Copied")
+     else
+        Writelog(".cco file does not exist")
+     end if
+
+ 
+  ]]>
+  </g>
+</f>
+
+<f name="RestoreCCO" access="public" qi="Makes a copy of the CCO of the first document page">
+  <ap>
+   None<br/>
+  </ap>
+  <h>
+    <b>Restores the CC1 file (if it exists) of the first document page to a file of the same name with a CCO Extension.
+       This should be used after merging CCOs if you potentially want to restore the original CCO file..</b>
+  </h>
+  <lvl>
+      Page Level only
+  </lvl>
+  <ret>
+    Always True. <br/>
+  </ret>
+  <g>
+  <![CDATA[
+
+     On Error Resume Next
+
+     RestoreCCO = True
+
+     Dim oFS
+
+     Set oFS = CreateObject("Scripting.FileSystemObject")
+
+
+     if CurrentObj.ObjectType <> 2 then
+        Writelog("Action will run at the page level only")
+        Exit Function
+     end if
+
+
+     SourceFile = Left(CurrentObj.ImageName,Len(CurrentObj.ImageName)-4) & ".cc1"
+     DestinationFile = Left(CurrentObj.ImageName,Len(CurrentObj.ImageName)-4) & ".cco"
+     Writelog("Copying file: " & SourceFile)
+     Writelog("To: " & DestinationFile)
+
+     if oFS.FileExists(SourceFile) then
+        Call oFS.CopyFile(SourceFile,DestinationFile)
+        Writelog("File Copied")
+     else
+        Writelog(".cc1 file does not exist")
+     end if
+
+ 
+  ]]>
+  </g>
+</f>
+</rrx>

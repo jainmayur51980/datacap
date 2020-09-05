@@ -1,0 +1,438 @@
+<ruleset name="Validate" id="6" ver="35" modder="admin.1" dt="03/29/12 15:08:45.517 " src_ver="34" qi="">
+	<rule name="Validate Page" id="1">
+		<func name="Function1">
+			<a name="Status_Preserve_OFF" ns="rrunner">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ClearErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="CaptureOpInfo" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" name="StrParam"/>
+			</a>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@P\Routing_Instructions"/>
+				<p name="object2" v="None"/>
+			</a>
+		</func>
+		<func name="Function2">
+			<a name="SkipChildren" ns="rrunner">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice Number Rule" id="2">
+		<func name="Field Filled function">
+			<a name="SetIsOverrideable" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="True" name="StrParam"/>
+			</a>
+			<a name="IsFieldLengthMin" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Field empty function">
+			<a name="IsFieldLengthMax" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Error Msg function">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice Number must have a minimum length of 2. or blank." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice Date" id="3" qi="">
+		<func name="If Comma Separator Validate Date based on DMY format by setting a locale">
+			<a name="DeleteLCSpaces" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ReplaceChars" ns="Validations" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="-,/,*" name="StrParam"/>
+			</a>
+			<a name="SetIsOverrideable" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="False" name="StrParam"/>
+			</a>
+			<a name="IsOriginalEuroFormat" ns="APT_Localization" qi="If the separator is a comma, then the source date format is either DMY or YMD.&#xA;"/>
+			<a name="rrSet" ns="rrunner" qi="">
+				<p name="varSource" v="en-GB"/>
+				<p name="varTarget" v="@F.hr_locale"/>
+			</a>
+			<a name="IsFieldDate" ns="Validations" qi="While IsFieldDateWithReformat also does validation, here IsFieldDate is called first because if the validation fails, the original field value will not be changed.  If validation fails with IsFieldDateWithReformat, the original field value is deleted.&#xA;">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsFieldDateWithReformat" ns="Validations" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="yyyy/mm/dd" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Validate Date based on US invoice setting a locale" qi="">
+			<a name="IsInvoiceFromUS" ns="APTCustom" qi="If a US format zip code, then the date format should be MDY.&#xA;"/>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="en-US"/>
+				<p name="varTarget" v="@F.hr_locale"/>
+			</a>
+			<a name="IsFieldDate" ns="Validations" qi="While IsFieldDateWithReformat also does validation, here IsFieldDate is called first because if the validation fails, the original field value will not be changed.  If validation fails with IsFieldDateWithReformat, the original field value is deleted.&#xA;">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsFieldDateWithReformat" ns="Validations" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="yyyy/mm/dd" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Else Validate Date based on NON US invoice setting a locale">
+			<a name="rrSet" ns="rrunner" qi="">
+				<p name="varSource" v="en-GB"/>
+				<p name="varTarget" v="@F.hr_locale"/>
+			</a>
+			<a name="IsFieldDate" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsFieldDateWithReformat" ns="Validations" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="yyyy/mm/dd" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Error Msg function" qi="">
+			<a name="rrSet" ns="rrunner" qi="Nothing seemed to work, do not set a locale at the field level.&#xA;">
+				<p name="varSource" v="@EMPTY"/>
+				<p name="varTarget" v="@F.hr_locale"/>
+			</a>
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice Date must be a valid date, and not a future date." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Vendor rule" id="4">
+		<func name="Validate Vendor Function">
+			<a name="SetIsOverrideable" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="False" name="StrParam"/>
+			</a>
+			<a name="ValidateVendor" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/lookupdb:cs)" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Vendor Error Msg">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Vendor, Vendor Number, and Vendor Zip were not found in the database." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Vendor Number Rule" id="5">
+		<func name="Validate Vendor Number Function">
+			<a name="IsFieldLengthMin" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Vendor Number Error message">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Vendor Number cannot be blank." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Tax" id="6">
+		<func name="Validate field function - Comma Sep">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization"/>
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0123456789," name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Validate field function - Period Decimal Sep" qi="">
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v="."/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0123456789." name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Empty function">
+			<a name="IsFieldLengthMax" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Tax Error Function">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Tax must be blank or a valid currency amount." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Shipping" id="7">
+		<func name="Validate Field Function - Comma Sep">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization" qi=""/>
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization" qi="">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890," name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Validate Field Function - Period Decimal Sep (default)" qi="">
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v="."/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890." name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Copy of Empty function">
+			<a name="IsFieldLengthMax" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Shipping Error Function">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Shipping must be blank or a valid currency amount." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="ItemDesc Rule" id="8">
+		<func name="Field Populated">
+			<a name="IsFieldLengthMin" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="3" name="StrParam"/>
+			</a>
+		</func>
+		<func name="ItemDesc Error Function">
+			<a name="AddToDetailErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Description cannot be blank" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Qty Rule" id="9">
+		<func name="Field Populated Function - Comma Sep">
+			<a name="IsOriginalEuroFormat" ns="APT_Localization" qi=""/>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890," name="StrParam"/>
+			</a>
+			<a name="ConvertToLocalDecimal" ns="APT_Localization"/>
+		</func>
+		<func name="Field Populated Function - Period Decimal Sep (Default)">
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890." name="StrParam"/>
+			</a>
+			<a name="ConvertToLocalDecimal" ns="APT_Localization" qi=""/>
+		</func>
+	</rule>
+	<rule name="Price" id="10">
+		<func name=" Field Populated Function - Comma Sep">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization" qi=""/>
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890,-" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Field Populated Function  - Period Decimal Sep (Default)">
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890.-" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="LineTotal Rule" id="11" qi="">
+		<func name=" Field Populated Function - Comma Sep" qi="">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization"/>
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization" qi="">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890,-" name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="CalculateLineItemLocalized" ns="APTCustom">
+				<p name="Tolerance" v="0,02"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="Qty"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="LineTotal"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="Price"/>
+			</a>
+		</func>
+		<func name="Field Populated Function -  Period Decimal Sep (Default)" qi="">
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v="."/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890.-" name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="CalculateLineItemLocalized" ns="APTCustom">
+				<p name="Tolerance" v="0.02"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="LineTotal"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="Qty"/>
+			</a>
+			<a name="MakeFieldHighConfidence" ns="APTCustom">
+				<p name="FieldName" v="Price"/>
+			</a>
+		</func>
+		<func name="Calculation Error Function">
+			<a name="AddToDetailErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Error in line total" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice Total Rule" id="12">
+		<func name="Field Populated Function - Comma Sep">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization"/>
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890,-" name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="CalculateInvoiceTotalLocalized" ns="APTCustom">
+				<p name="Tolerance" v="0,02"/>
+			</a>
+		</func>
+		<func name="Field Populated Function - Period Decimal Sep (Default)" qi="">
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization" qi="">
+				<p name="TestChar" v="."/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1234567890.-" name="StrParam"/>
+			</a>
+			<a name="IsFieldLocalCurrency" ns="APT_Localization">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="CalculateInvoiceTotalLocalized" ns="APTCustom">
+				<p name="Tolerance" v="0.02"/>
+			</a>
+		</func>
+		<func name="Invoice total Error Message">
+			<a name="AddToErrorMsg" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice Total must equal the sum of line totals, plus tax and shipping." name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Capture Operator Info" id="13">
+		<func name="Function1">
+			<a name="CaptureOpInfo" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Tax Detail Close" id="14">
+		<func name="Function1">
+			<a name="AddAllTaxesToTaxField" ns="APTCustom"/>
+		</func>
+	</rule>
+	<rule name="Tax_Value Rule" id="15">
+		<func name="Adjust To Match Current Locale">
+			<a name="ConvertToLocalDecimal" ns="APT_Localization" qi=""/>
+		</func>
+	</rule>
+</ruleset>

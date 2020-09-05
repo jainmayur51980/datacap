@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="AddFingerprint" id="25" ver="2" modder="admin.2" dt="09/15/14 05:07:45.181 " qi="">
+	<rule name="Page Type Other" id="1">
+		<func name="Function1">
+			<a name="AnalyzeImage" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetFingerprintRecogPriority" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="RecognizePageOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions" qi=""/>
+		</func>
+	</rule>
+</ruleset>

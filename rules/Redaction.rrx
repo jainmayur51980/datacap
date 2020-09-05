@@ -1,0 +1,331 @@
+<?xml version='1.0' ?>
+<rrx namespace="Redaction" v="7.5.3"><i ref="rrunner"/><i ref="locate"/><![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2012 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------
+'*********************************
+'     Version
+'     1.0.0 -  Tom Stuart '04/17/06
+'
+Version = "8.1.0.2"
+'     Updated 11/09/2013 RFerin Workitem 69384
+'     Deprecated GetAllBarcodes, RedactByRegEx, EraseRect & RedactField - Action functionality unchanged.  
+'     RedactByRegEx moved (copied for now) to Imprint Action library.
+'
+'
+'*************************************************
+' LOG VERSION:
+Writelog("Redaction Actions " & Version)
+'*************************************************
+
+]]><f name="EraseRectangle" access="private" qi=""><p name="pImCtrl"/><p name="nLeft"/><p name="nTop"/><p name="nRight"/><p name="nBottom"/><p name="bWhite"/><ap>Description of Parameter value(s)</ap><lvl>Action works at the ?Batch/Doc/Page/All? level</lvl><ret>Action returns TRUE/FALSE when...?</ret><h><![CDATA[Detailed Help]]><e>example of use</e></h><![CDATA[
+   EraseRectectangle=False
+
+    If pImCtrl.FileName="" Then
+       Writelog("EraseRectangle could not detect imagename.  Exiting")
+       Exit Function
+   End If
+   clrAnnot=RGB(0,0,0)
+   If bWhite Then clrAnnot=RGB(255,255,255)
+
+    Call pImCtrl.DrawRect(nLeft, nTop, nRight, nBottom, 1, clrAnnot,RGB(0,0,0), "")
+    If pImCtrl.MergeAnnotations(False) Then 
+        EraseRectangle=True
+   End if
+
+]]></f><af name="GetAllBarcodes" access="public" bInter="bInter" bDebug="bDebug" strParam="StrParam" qi="">
+  <ap></ap>
+  <lvl></lvl>
+  <ret></ret>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the GetAllBarcodesBP action in the Barcode_P library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+    <e></e>
+  </h>
+  <![CDATA[
+Dim oPage
+Dim strImage
+Dim arrBarcodes
+Dim nBarcodes
+
+   GetAllBarcodes = False
+   If (CurrentObj.ObjectType <> 2) Then
+      WriteLog("Not on a page object.  Exiting")
+      Exit Function
+   End if
+
+   Set oPage = CurrentObj
+   oPage.Variable("GetBarCode") = ""
+   strImage = oPage.ImageName
+   WriteLog("ImageName: " & strImage)
+
+   oBarCode.SetDefaultOptions()
+   'Read BarCode Settings out of DCO Setup
+    str = ""
+    str = CurrentObj.SetupNode.Variable("b_tp")		'Type
+    If (str<>"") Then oBarCode.BarcodeType = 2^(CInt(Left(str,3))) : str = ""
+    str = CurrentObj.SetupNode.Variable("b_or")		'Orientation
+    If (str<>"") Then oBarCode.Orientation = CInt(Left(str,3)) : str = ""
+    str = CurrentObj.SetupNode.Variable("b_qt")		'Quality
+    If (str<>"") Then oBarCode.Quality = CInt(Left(str,3)) : str = ""
+    str = CurrentObj.SetupNode.Variable("b_wd")		'Width
+    If (str<>"") Then oBarCode.Width = CInt(str) : str = ""
+    str = CurrentObj.SetupNode.Variable("b_ht")		'Height
+    If (str<>"") Then oBarCode.Height = CInt(str) : str = ""
+
+   str = oBarCode.ReadAllBarcodes(strImage, arrBarcodes)
+   WriteLog("GetAllBarCodes: " & str)
+
+   If IsArray(arrBarcodes) Then
+      nBarcodes = UBound(arrBarcodes, 1)
+      For n = 0 To nBarcodes
+         strBarcode =  arrBarcodes(n, 0)
+         Writelog("Found Barcode: " & strBarcode)
+         if oPage.Variable("GetBarCode") = "" then
+            oPage.Variable("GetBarCode") = strBarcode
+         else
+            oPage.Variable("GetBarCode") = oPage.Variable("GetBarCode") & StrParam & strBarcode 
+         end if
+      Next
+   Else
+      WriteLog("GetAllBarCodes: No barcode found. Exiting")
+      Exit Function
+   End If
+
+   GetAllBarcodes = TRUE
+
+]]></af>
+
+<af name="EraseRect" access="public" bInter="bInter" bDebug="bDebug" strParam="StrParam" qi="">
+  <ap></ap>
+  <lvl></lvl>
+  <ret></ret>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the Redact action in the Imprint library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+    <e></e>
+  </h>
+  <![CDATA[
+Dim fso
+Dim nLeft
+Dim nTop
+Dim nRight
+Dim nBottom
+Dim ParamAr
+Dim dcim
+
+   Writelog("Function EraseRect")
+   EraseRect = FALSE   
+
+   ParamAr = Split(StrParam,",")
+
+   if uBound(ParamAr) <> 4 then
+      Writelog("Wrong number of parameters.  Expecting EraseRect(nLeft,nTop,nRight,nBottom,bWhite).  Exiting")
+      Exit Function
+   end if
+
+   Writelog("Setting zone")
+
+   nLeft = ParamAr(0)
+   nTop = ParamAr(1)
+   nRight= ParamAr(2)
+   nBottom=ParamAr(3)
+   bWhite=ParamAr(4)
+ 
+   Writelog("Zones set")
+   Set dcim =CreateObject("DCImage.DCImageCtrl.1")
+   Writelog("Image control created")
+
+   bResult=False
+   dcim.FileName=CurrentObj.Variable("IMAGEFILE")      ' - works for both field and page level.
+   Writelog("Calling EraseRectangle")
+   If EraseRectangle(dcim, nLeft, nTop, nRight, nBottom, bWhite) Then
+       bResult=True
+   End if
+   Writelog("Erase Rectangle done")
+   Set fso=CreateObject("Scripting.FileSystemObject")
+   Writelog("fso created")
+   If bResult Then
+      Call fso.DeleteFile(CurrentObj.Variable("IMAGEFILE") , True)
+      Writelog("Erased")
+      dcim.Save(CurrentObj.Variable("IMAGEFILE") )
+      Writelog("Saved")
+   End If
+   EraseRect=bResult
+   Set dcim = Nothing
+
+]]></af>
+
+
+<af name="RedactField" access="public" bInter="bInter" bDebug="bDebug" strParam="StrParam" qi="">
+  <ap></ap>
+  <lvl></lvl>
+  <ret></ret>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the Redact action in the Imprint library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+    <e></e>
+  </h>
+  <![CDATA[
+'0 redacts in black, 1 redacts to white (default)
+
+Dim fso
+Dim nLeft
+Dim nTop
+Dim nRight
+Dim nBottom
+Dim ParamAr
+Dim dcim
+
+   Writelog("Function RedactField")
+   RedactField=TRUE
+
+   if CurrentObj.ObjectType <> 2 then
+       Writelog("Action must be on a page object.  Exiting")
+        Exit Function
+   End if
+ 
+   Set fso=CreateObject("Scripting.FileSystemObject")
+   ParamStr = CurrentObj.Variable("Position") & "," & StrParam
+
+   ParamAr = Split(ParamStr,",")
+
+   if uBound(ParamAr) <> 4 then
+      Writelog("Wrong number of parameters.  Expecting RedactField(bWhite) and a valid position string on the field.  Exiting")
+      Exit Function
+   end if
+
+   Writelog("Setting zone")
+
+   nLeft = ParamAr(0)
+   nTop = ParamAr(1)
+   nRight= ParamAr(2)
+   nBottom=ParamAr(3)
+   bWhite=ParamAr(4)
+ 
+   Writelog("Zones set")
+
+   Set dcim =CreateObject("DCImage.DCImageCtrl.1")
+
+   Writelog("Image control created")
+
+   bResult=False
+
+   if CurrentObj.Variable("RedactImage") <> "" then
+       Writelog("Found a local variable named RedactImage.  Using image: " & CurrentObj.Variable("RedactImage"))
+       if fso.FileExists(CurrentObj.Variable("RedactImage")) then
+         dcim.FileName=CurrentObj.Variable("RedactImage")
+      else
+         Writelog("Local variable did not contain a valid file.  Exiting Function")
+         Exit Function
+      end if
+    else  
+       Writelog("Did not find a local variable called RedactImage.  Using the IMAGEFILE setting: "  & CurrentObj.Variable("IMAGEFILE"))
+       dcim.FileName=CurrentObj.Variable("IMAGEFILE")
+   end if
+
+
+   Writelog("Calling EraseRectangle")
+   If EraseRectangle(dcim, nLeft, nTop, nRight, nBottom, bWhite) Then
+       bResult=True
+   End if
+   Writelog("Erase Rectangle done")
+
+   Writelog("fso created")
+   If bResult Then
+      Call fso.DeleteFile(CurrentObj.Variable("IMAGEFILE") , True)
+      Writelog("Erased")
+      dcim.Save(CurrentObj.Variable("IMAGEFILE") )
+      Writelog("Saved")
+   End If
+   RedactField=TRUE
+   Set dcim = Nothing
+
+]]></af>
+
+<f name="RedactByRegEx" access="public" qi="Sample starter RRX Library">
+  <p name="RegEx"/>
+  <p name="VariableBase" />
+  <ap>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the RedactByRegEx action in the Imprint library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>    
+    <e>
+    </e>
+  </h>
+  <lvl>
+  </lvl>
+  <ret>
+  </ret>
+  <see>
+  </see>
+  <g>
+  <![CDATA[
+  'Your VBScript code goes here.
+
+
+    RedactByRegEx = TRUE       'Actions must always return a TRUE or FALSE.
+ 
+ 
+
+
+     if CurrentObj.ObjectType <> 3 then
+         Writelog("This action must be on the Field level.  Exiting")
+         Exit Function
+    end if
+    count = 1
+     if  RegExFind(false, false, RegEx) then
+          Call UpdateField(false, false)
+          FoundFieldPosition = CurrentObj.Variable("Position")
+          Writelog("Found field position: " & FoundFieldPosition)
+          CurrentObj.Parent.Parent.Variable(VariableBase & cStr(count)) = CurrentObj.Parent.ID & "," & CurrentObj.Variable("Position")
+          count = 2
+          call RedactField(false,false,0)
+
+          While RegExFindNext( false, false, RegEx)
+             Call UpdateField(false, false)
+             If CurrentObj.Variable("Position") = FoundFieldPosition then
+                   Exit Function
+             else
+                  CurrentObj.Parent.Parent.Variable(VariableBase & cStr(count)) = CurrentObj.Parent.ID & "," & CurrentObj.Variable("Position")
+                  count = Count + 1
+                  call RedactField(false,false,0)
+              end if
+         Wend
+    end if
+   
+        
+
+  ]]>
+  </g>
+</f>
+
+
+
+</rrx>

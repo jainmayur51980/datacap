@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="PreExport" id="16" ver="8" modder="admin.2" dt="09/22/14 06:08:31.94 " src_ver="4" qi="">
+	<rule name="Document Level Rule PDF" id="4" qi="">
+		<func name="Copy ofPerform First Pass Function">
+			<a name="RecogContinueOnFailure" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="25" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="20"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="RecognizeToPDFOCR_S">
+				<p name="OutputPDFType" type="int" v="1"/>
+			</a>
+			<a ns="rrunner" name="rrCompare">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="0"/>
+			</a>
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="PDF Creation Success First Pass"/>
+			</a>
+		</func>
+		<func name="Copy ofManaged Auto  Rotation failure" qi="">
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="FALSE" name="strParam"/>
+			</a>
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="strParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="185" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="180"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="RecognizeToPDFOCR_S">
+				<p name="OutputPDFType" type="int" v="1"/>
+			</a>
+			<a ns="rrunner" name="rrCompare">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="2"/>
+			</a>
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="PDF Creation Success Second Pass"/>
+			</a>
+		</func>
+		<func name="Copy ofRotation Failue">
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="PDF Creation Failue"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Page Rule - Intellocate" id="1">
+		<func name="New FingerPrint Function">
+			<a name="IsChildFieldValue" ns="Invoice" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Add_New_Fingerprint,Yes" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="iloc_SetZones" ns="Intellocate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="iloc_SetDetailSimple" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Details" name="sDetailName"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Intellocate Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Add_New Yes Function">
+			<a name="IsChildFieldValue" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Add_New_Fingerprint,Yes" name="StrParam"/>
+			</a>
+			<a name="SetFingerprintDir" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(fingerprint)" name="StrParam"/>
+			</a>
+			<a name="RestoreCCO" ns="APTCustom.rrx"/>
+			<a name="CreateFingerprint" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="iloc_SetZones" ns="Intellocate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="iloc_SetDetailSimple" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Details" name="sDetailName"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify requested Add Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="DCO Status 75 Function">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="DeleteFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Deleted New Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Check for deleted fingerprint from Previous Function">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Rotation  Function">
+			<a name="ReadPageVariableValue" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Deleted Rotated Fingeprint" name="StrParam"/>
+			</a>
+			<a name="DeleteFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Check for deleted fingerprint from Previous Function">
+			<a name="ReadPageVariableValue" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation" name="StrParam"/>
+			</a>
+		</func>
+		<func name="New Fingerprint ">
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="iloc_SetZones" ns="Intellocate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="iloc_SetDetailSimple" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Details" name="sDetailName"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Intellocate Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Learn New Zones">
+			<a name="Learn_Zones" ns="Intellocate_Learning">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Empty Currency Rule" id="2">
+		<func name="Set Default Value">
+			<a name="IsThisFieldEmpty" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="AssignFieldDefault" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0.00" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Export Image" id="3">
+		<func name="Check For Delete">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@D.STATUS"/>
+				<p name="object2" v="128"/>
+			</a>
+		</func>
+		<func name="Check For Rescan">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@D.STATUS"/>
+				<p name="object2" v="129"/>
+			</a>
+		</func>
+		<func name="Check for Review">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@D.STATUS"/>
+				<p name="object2" v="145"/>
+			</a>
+		</func>
+		<func name="Export default PDF">
+			<a name="MovePDF" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(export)" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Export generic multipage">
+			<a name="SetToDocIDMPTIFF" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(export)" name="StrParam"/>
+			</a>
+		</func>
+		<func name="ExportImage 1 Function">
+			<a name="FindExportImage" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="StrParam"/>
+			</a>
+		</func>
+		<func name="ExportImage 2 Function">
+			<a name="FindExportImage" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="StrParam"/>
+			</a>
+		</func>
+		<func name="ExportImage 3 Function">
+			<a name="FindExportImage" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="3" name="StrParam"/>
+			</a>
+		</func>
+		<func name="ExportImage 4 Function">
+			<a name="FindExportImage" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="4" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Prep Vendor field for XML syntax" id="6">
+		<func name="Replace ' and &amp; characters">
+			<a name="ReplaceChars" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="',&amp;apos;,*" name="StrParam"/>
+			</a>
+			<a name="ReplaceChars" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="&amp;,&amp;amp;,*" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="POLineNum Rule" id="5">
+		<func name="Function1">
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="@F.PO Line Number"/>
+				<p name="varTarget" v="@F\POLineNum"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Page Rule - Intellocate with FPXML" id="7" qi="">
+		<func name="New FingerPrint Function">
+			<a name="SetDirectoryFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(fingerprint)" name="StrParam"/>
+			</a>
+			<a name="SetDetailsAndLineitemPairFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Details,Lineitem" name="StrParam"/>
+			</a>
+			<a name="IsChildFieldValue" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Add_New_Fingerprint,Yes" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="WriteZonesFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Intellocate Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Add_New Yes Function">
+			<a name="IsChildFieldValue" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Add_New_Fingerprint,Yes" name="StrParam"/>
+			</a>
+			<a name="SetFingerprintDir" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(fingerprint)" name="StrParam"/>
+			</a>
+			<a name="RestoreCCO" ns="APTCustom.rrx"/>
+			<a name="CreateFingerprint" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="WriteZonesFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify requested Add Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="DCO Status 75 Function">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="DeleteFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Deleted New Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Check for deleted fingerprint from Previous Function">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Rotation  Function">
+			<a name="ReadPageVariableValue" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation" name="StrParam"/>
+			</a>
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Deleted Rotated Fingeprint" name="StrParam"/>
+			</a>
+			<a name="DeleteFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Check for deleted fingerprint from Previous Function">
+			<a name="ReadPageVariableValue" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation" name="StrParam"/>
+			</a>
+		</func>
+		<func name="New Fingerprint ">
+			<a name="IsFingerPrintClass" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPVAR(*/fingerprintconn:cs)+,&lt;New&gt;" name="StrParam"/>
+			</a>
+			<a name="SetFingerprint" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="WriteZonesFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Intellocate Fingerprint" name="StrParam"/>
+			</a>
+		</func>
+		<func name="LearnZones">
+			<a name="Learn_ZonesFPX" ns="Intellocate_Learning">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="WriteZonesFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@P\Vendor" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

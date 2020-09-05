@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="Recognize" id="4" ver="5" modder="admin.2" dt="09/22/14 05:26:25.719 " src_ver="2" qi="">
+	<rule name="Recognize Page" id="1">
+		<func name="Recognize Dot Matrix Function" qi="">
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="Normal"/>
+				<p name="varTarget" v="@P.RecogType"/>
+			</a>
+			<a name="Is_JobName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Demo-Dot Matrix" name="StrParam"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="7"/>
+				<p name="varTarget" v="@P.s_fg"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="3"/>
+				<p name="varTarget" v="@P.s_ml"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="Dot_Matrix"/>
+				<p name="varTarget" v="@P.RecogType"/>
+			</a>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="Normal"/>
+				<p name="object2" v="@P.RecogType"/>
+			</a>
+		</func>
+		<func name=" Recognize normal pages (not dot matrix)">
+			<a name="SetFingerprintRecogPriority" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="RecogContinueOnFailure" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="25" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="20"/>
+			</a>
+			<a name="RecognizePageOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions"/>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="0"/>
+			</a>
+			<a name="CreateTextFile" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Recog - First Level" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Managed OCR Failure">
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="FALSE" name="strParam"/>
+			</a>
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="strParam"/>
+			</a>
+			<a name="SetFingerprintRecogPriority" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="185" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="180"/>
+			</a>
+			<a name="RecognizePageOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions"/>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="0"/>
+			</a>
+			<a name="CreateTextFile" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Recog - Second Level" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Second Recog Attempt Failure - Delete Document">
+			<a name="rrCompareNot" ns="rrunner">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="1"/>
+			</a>
+			<a name="SetDocStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="128" name="StrParam"/>
+			</a>
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Recog - Deleted Document" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Blank detected">
+			<a name="IncrementBatchVar" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Recog - Detected Blank" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

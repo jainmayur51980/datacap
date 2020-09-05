@@ -1,0 +1,87 @@
+<ruleset name="SetStatuses" id="23" ver="2" modder="admin.1" dt="01/19/11.139  12:44:56.139 " src_ver="1" qi="">
+	<rule name="Check Routing_Instructions" id="1">
+		<func name="Function1">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VALUE"/>
+				<p name="object2" v="Delete"/>
+			</a>
+			<a name="SetPageStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+			<a name="SetDocStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="128" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Function2">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VALUE"/>
+				<p name="object2" v="Rescan"/>
+			</a>
+			<a name="SetPageStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="70" name="StrParam"/>
+			</a>
+			<a name="SetDocStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="129" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Function3">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VALUE"/>
+				<p name="object2" v="Review"/>
+			</a>
+			<a name="SetPageStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="79" name="StrParam"/>
+			</a>
+			<a name="SetDocStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="145" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Set Routing Instruction Field" id="2">
+		<func name="Function1">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="75" name="StrParam"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="Delete"/>
+				<p name="varTarget" v="@P\Routing_Instructions"/>
+			</a>
+		</func>
+		<func name="Function2">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="70" name="StrParam"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="Rescan"/>
+				<p name="varTarget" v="@P\Routing_Instructions"/>
+			</a>
+		</func>
+		<func name="Function3">
+			<a name="ChkDCOStatus" ns="DCO">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="79" name="StrParam"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="Review"/>
+				<p name="varTarget" v="@P\Routing_Instructions"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

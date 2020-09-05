@@ -1,0 +1,278 @@
+<?xml version='1.0' ?>
+<rrx namespace="Documents" v="8.0.1.05"><i ref="rrunner"/><g>
+  <![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2013 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------  
+  
+'*********************************
+'Document Actions
+'Documents.rrx
+
+' Version
+'  1.0.0 - Tom Stuart 09/10/2009
+'  8.0.4 - 08/02/2010 RFerin & Tom Stuart
+'        - Added to make the XML format more compliant and help with editing.  Requires buildvbs.rls 1.0.2.2.
+'        - 28188 Added help text to RemoveDocumentStructure.
+'
+' Version = "8.0.1.05"
+' Updated 01/07/2011 PHofle
+' * Removed file extension name (extn) from <i ref="namespace.extn"> tags, just uses namespace for use
+'   with TM8.01 locale RRS. Now looks like <i ref="namespace">.
+'
+' Version = "8.1.0.0"
+' Updated 12/06/2011 Tom Stuart
+' * added ' Version = "8.0.1.05"
+'' * Added CombinePreviousDoc
+'
+'Version = "8.1.0.1"
+'  12/11/2013 RFerin
+'  Minor help text changes.
+'
+Version = "9.0.0.2"
+'  03/26/2014 RFerin
+' * 75531 Moved the following actions to the DCO library: RemoveDocumentStructure. CountPagesToDocVar. CombinePreviousDoc and IsFirstDocInBatch
+'  The actions in this library still work but have been marked for deprecation and removal in a future release.
+
+Writelog("Documents Actions " & Version)
+'*********************************
+
+]]></g>
+
+<af name="RemoveDocumentStructure" access="public" bInter="bInter" bDebug="bDebug" qi="Removes the document hierarchy from the batch.">
+  <ap>
+    None.
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the RemoveDocumentStructure action in the DCO library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    This action will flatten the document - page hierarchy from the batch.  If the batch consists of multiple documents,
+    each with a set of pages, the document level is removed and all of the pages become a flat structure.
+    Once complete, there is no distinction of sets of pages within a document.
+    <e>
+      <b>RemoveDocumentStructure()</b>
+    </e>
+  </h>
+  <lvl>Batch level.</lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+<g><![CDATA[
+Dim oDoc
+
+    RemoveDocumentStructure = TRUE
+
+    For i = 0 to DCO.NumOfChildren - 1        'loop through the objects that are children of the batch	
+        if DCO.GetChild(i).ObjectType = 1 then    'found a document
+            Set oDoc = DCO.GetChild(i)
+            While oDoc.NumOfChildren > 0
+                Call oDoc.GetChild(0).MoveIn(DCO,-1)
+            Wend
+        end if
+    next 'i
+
+	'remove the documents
+	
+	For i = DCO.NumOfChildren - 1   to 0 Step - 1
+	   if DCO.GetChild(i).ObjectType = 1 then
+	      Call DCO.DeleteChild(i)
+	   end if
+    Next 'i  	   
+    Writelog("Structure removed")
+]]></g></af>
+
+
+<af name="CountPagesToDocVar" access="public" bInter="bInter" bDebug="bDebug" strParam="StrParam" qi="Counts the number of pages in the document.">
+  <ap>
+    The variable that will hold the page count.
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the CountPagesToDocumentVar action in the DCO library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    This action will count the number of page objects in a document and write the result in a document variable. 
+    <e>
+      <b>CountPagesToDocVar("MyVarName")</b>
+    </e>
+  </h>
+  <lvl>Document level.</lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+<g><![CDATA[
+   Dim i
+   Dim PageCount
+   CountPagesToDocVar = TRUE
+    if CurrentObj.ObjectType <> 1 then
+        Writelog("Action must be on a document object.  Exiting")
+        Exit Function
+   end if
+
+   PageCount = 0
+   For i = 0 to CurrentObj.NumOfChildren -1
+      if CurrentObj.GetChild(i).ObjectType = 2 then
+         PageCount = PageCount + 1
+     end if
+   next 'i
+    
+   CurrentObj.Variable(StrParam) = cStr(PageCount)
+]]></g>
+</af>
+
+<f name="CombinePreviousDoc" access="public" qi="Combines previous document into this one">
+  <p name="DocTypeToCombine"/>
+
+  <ap>
+   Document Type of previous document (to be combined).<br/>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the JoinPreviousDocument action in the DCO library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+
+    <b>*** Deprecated Help Description ***</b><br/>
+         Copies the pages of the previous named document into the front of this docuemnt.<br/>
+    <e>
+      <b>CombinePreviousDoc(SeparatorDoc)</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Document Level Only.
+  </lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+  <g>
+  <![CDATA[
+  'Your VBScript code goes here.
+
+   Dim oCurrentDoc
+   Dim oPreviousDoc
+   Dim oPageToMove
+
+   
+    CombinePreviousDoc = TRUE       'Actions must always return a TRUE or FALSE.
+
+    If CurrentObj.ObjectType <> 1 then
+       Writelog("This action goes on a DOCUMENT type object (the first page of the document you want to combine the previous document into")
+       Exit Function
+    End if
+
+    
+    Set oCurrentDoc = CurrentObj
+
+    CurrentDocIndex = oCurrentDoc.Parent.FindChildIndex(oCurrentDoc.ID)
+    Writelog("CurrentDocIndex: " & cStr(CurrentDocIndex) )
+
+    if CurrentDocIndex = 0 then
+       Writelog("This is the first document in the batch, so there are no previous documents.  Exiting")
+       Exit Function
+    end if
+
+    Set oPreviousDoc = oCurrentDoc.Parent.GetChild(CurrentDocIndex - 1) 
+
+    if oPreviousDoc.Type <>  DocTypeToCombine then
+        Writelog("The previous document was the wrong type to combine: " & oPreviousDoc.Type & ".  Exiting.")
+        Exit Function  
+    End if
+
+    For i = oPreviousDoc.NumOfChildren - 1 to 0 Step - 1
+        Set oPageToMove = oPreviousDoc.GetChild(i)
+        Writelog("Attempting to move: " & oPageToMove.ID)
+        If oPageToMove.MoveIn(oCurrentDoc,0) then
+           Writelog("Moved successfully")
+        else
+           writelog("Unable to move document")
+        end if
+    next 'i
+
+    'Delete oPreviousDocument if empty
+
+     Writelog("Moves done.")
+
+     if oPreviousDoc.NumOfChildren = 0 then
+        Call oPreviousDoc.Parent.DeleteChild(CurrentDocIndex - 1)
+        Writelog("Successfully moved page(s) and deleted document")
+     else
+        Writelog("Not all pages were moved.  Did not delete document")
+     end if
+
+
+  ]]>
+  </g>
+</f>
+
+
+<f name="IsFirstDocInBatch" access="public" qi="Checks to see if this is the first document in the batch">
+  <ap>
+   None.<br/>
+  </ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the IsFirstDocumentInBatch action in the DCO library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    Checks to see if this is on an object in the first document in a batch.<br/>
+    <e>
+      <b>IsFirstDocInBatch()</b> <br/>
+    </e>
+  </h>
+  <lvl>
+      Document, Page or Field.
+  </lvl>
+  <ret>
+    <b>True</b> if on the first document, or an object in the first document.  Otherwise <b>False.</b>
+  </ret>  
+  <g>
+  <![CDATA[
+  'Your VBScript code goes here.
+   Dim oDoc
+
+   Set oDoc = CurrentObj
+
+   While oDoc.ObjectType > 1
+         Set oDoc = oDoc.Parent
+   Wend
+
+   if oDoc.ObjectType = 0 then 
+      Writelog("No document object found.  Exiting")
+      Exit Function
+   end if
+
+   if DCO.GetChild(0).ID = oDoc.ID then
+        IsFirstDocInBatch = TRUE
+   else
+        IsFirstDocInBatch=FALSE
+   end if
+
+  ]]>
+  </g>
+</f>
+</rrx>

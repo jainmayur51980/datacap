@@ -1,0 +1,38 @@
+﻿<?xml version='1.0' ?>
+<!--  
+ Licensed Materials - Property of IBM
+ “Restricted Materials of IBM”
+ 5725-C15 5725-C69
+
+ © Copyright IBM Corp. 1994, 2013 All Rights Reserved
+
+ US Government Users Restricted Rights - Use, duplication or
+ disclosure restricted by GSA ADP Schedule Contract with
+ IBM Corp.
+-->
+<rrx namespace="FlexID" v="1.0.0">
+  <com ref="Datacap.Libraries.FlexID.Actions"  qi="Displays the FlexID Panel when Running Rules.">
+    <!-- Example action declaration -->
+    
+    <method name="RunFlexIDPanel" qi="sample method declaration in RRX">
+                  <p name="SettingsFile" type="string"/>
+
+      <ap>
+        SettingsFile: The full path to the settings file for the FlexID panel.<br/>
+      </ap>
+      <h>
+        Displays the FlexID panel.  This action must never be used in a background process.
+        <e>
+          <b>RunFlexIDPanel("c:\datacap\flex\dco_flex\settings.ini")</b><br/>
+          rrCompare("@B.Hold", "YES")<br/>
+          SetTaskStatus("4")<br/>
+        </e>
+      </h>
+      <lvl>All levels.</lvl>
+      <ret>
+        Always <b>True.</b>
+      </ret>  
+    </method>
+
+  </com>
+</rrx>

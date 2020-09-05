@@ -1,0 +1,29 @@
+<ruleset name="AutoCalc" id="20" ver="2" modder="admin.1" dt="04/04/11.16  22:18:44.16 " src_ver="1" qi="">
+	<rule name="LineItem Rule" id="1">
+		<func name="Detail Fix Function">
+			<a name="DetailFix" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Character allowed Rule" id="2">
+		<func name="Allow Only Chars Function - Comma Dec Sep">
+			<a name="IsLocalDecimalSeparator" ns="APT_Localization">
+				<p name="TestChar" v=","/>
+			</a>
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="0123456789,-"/>
+			</a>
+		</func>
+		<func name="Allow Only Chars Function - Period Dec Sep">
+			<a name="AllowOnlyChars" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="0123456789.-" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

@@ -1,0 +1,18 @@
+<ruleset id="30" name="FlexID" ver="6" modder="admin.1" qi="" dt="04/20/12 13:28:07.879 " src_ver="5">
+	<rule name="Rule1" id="1">
+		<func name="Function1">
+			<a name="RunFlexIDPanel" ns="com:Datacap.Libraries.FlexID.Actions=Datacap.Libraries.FlexID.Actions" qi="">
+				<p name="SettingsFile" type="string" v="c:\datacap\flex\dco_flex\settings.ini"/>
+			</a>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@B.Hold"/>
+				<p name="object2" v="YES"/>
+			</a>
+			<a name="SetTaskStatus" ns="rrunner" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="4" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

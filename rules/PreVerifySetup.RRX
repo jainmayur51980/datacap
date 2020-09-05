@@ -1,0 +1,99 @@
+<?xml version='1.0' ?>
+<rrx namespace="PreVerifySetup" v="8.0.0"><i ref="rrunner"/><g>
+  <![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2012 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------  
+  
+'*********************************
+'PreVerifySetup Actions
+'PreVerifySetup.rrx
+
+' Version
+'  8.0.0 - 03/29/2012   Tom Stuart
+'        - Added SetLabels
+'
+'*********************************
+
+]]></g>
+
+
+<f name="SetObjectLabel" access="private">
+<p name="INIFile"/>
+<p name="Obj" type="object"/>
+  <g>
+ <![CDATA[
+     If Obj.ObjectType = 3 then
+           retn = Pilot.GetProfileString("Verification Labels",Obj.Type,"*",INIFile)
+           if retn <> "*" then
+               Obj.Variable("label") = retn
+               Writelog(Obj.ID & "'s label was set to: " & Obj.Variable("label") )
+          else
+                call Pilot.SetProfileString("Verification Labels",Obj.Type,Obj.Type,INIFile)
+                Writelog(Obj.Type & " field was added to the [Verification Labels] section of the INI file")
+          end if
+    end if
+    for i = 0 to Obj.NumOfChildren - 1
+         call SetObjectLabel(INIFile,Obj.GetChild(i))
+    next 'i
+
+  ]]>
+  </g>
+</f>
+
+<f name="SetLabels" access="public" qi="Sets the label variables from an INI file">
+  <ap>
+   FileName of your INI file, or Smart Parameter which resolves to the FileName of your INI file.<br/>
+  </ap>
+  <h>
+        Reads an INI file and sets the label variable used by TMWeb and DotEdit to display the label on eachfield.<br/>
+    The settings file needs to follow the following format:<br/>
+     [Verification Labels]<br/>
+     FieldName1=DisplayLabel<br/>
+     FieldName2=DisplayLabel<br/>
+     etc.<br/>
+     Note: The action will add missing field types to the INI file, and set them to the current field type for later editing.  This action is not compatable nor necessary with applications based on Flex technology.
+    <e>
+        SetLabels("@APPPATH(settingsfile) ")<br/>
+    </e>
+  </h>
+  <lvl>
+      Any level, but will only process fields that are decendents of the object upon which you place the action, and the object itself  (if it is a field object).  To ensure that you label all fields, place at the Batch Level.
+  </lvl>
+  <ret>
+        Always <b>TRUE</b> 
+  </ret>
+  <p name="INIFile"/>
+  <g>
+
+  <![CDATA[
+    SetLabels = TRUE       'Actions must always return a TRUE or FALSE.
+
+    INIFile = MetaWord(INIFile)
+    Writelog("Attempting to read settings from: " & INIFile)
+
+    Dim oFS
+    Set oFS = CreateObject("Scripting.FileSystemObject")
+    if Not oFS.FileExists(INIFile) then
+         Writelog("Could not find settings file.  Check your parameter")
+         Exit Function
+   end if
+
+   call SetObjectLabel(INIFile,DCO)
+
+  ]]>
+  </g>
+</f>
+
+
+
+</rrx>

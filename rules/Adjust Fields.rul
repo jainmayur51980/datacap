@@ -1,0 +1,10 @@
+<ruleset name="Adjust Fields" id="22" ver="1">
+	<rule name="Add Page_No References" id="1">
+		<func name="Funcion 1">
+			<a name="GenerateDetails" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

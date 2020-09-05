@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="Locate" id="11" ver="11" modder="admin.2" dt="09/22/14 05:34:35.138 " src_ver="9" qi="">
+	<rule name="Document Level Rule" id="1">
+		<func name="Skip during Verify Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Multi page Function">
+			<a name="IsMultipageDocument" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="BackupCCO" ns="APTCustom.rrx" qi=""/>
+			<a name="MergeCCOs_ByType" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Main_Page,Trailing_Page" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Page Level Rules" id="2">
+		<func name="Sticky Function">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VAR(Sticky)"/>
+				<p name="object2" v="No"/>
+			</a>
+			<a name="SkipChildren" ns="rrunner">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Called From Verify Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Zones Function">
+			<a name="SetDirectoryFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(fingerprint)" name="StrParam"/>
+			</a>
+			<a name="SetDetailsAndLineitemPairFPX" ns="FPXML">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Details,Lineitem" name="StrParam"/>
+			</a>
+			<a name="ReadZonesFPX" ns="FPXML" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="FPXML"/>
+				<p name="varTarget" v="@P.ZoneRead"/>
+			</a>
+			<a name="IsMultipageDocument" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetEOL" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="|" name="bParam"/>
+			</a>
+		</func>
+		<func name="FPXML Used Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Read Zones Function">
+			<a name="ReadZones" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="rrSet" ns="rrunner" qi="">
+				<p name="varSource" v="SetupDCO"/>
+				<p name="varTarget" v="@P.ZoneRead"/>
+			</a>
+			<a name="IsMultipageDocument" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetEOL" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="|" name="bParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice Number Rule" id="3">
+		<func name="Called from Verify Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+			<a name="LoadCCOFromField" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Populate Zones Function">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Right 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvNum" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvNum" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name=" Key List Right 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvNum" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvNum" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice_Date Rule" id="4">
+		<func name="Populate Zones Function">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Right 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvDate" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvDate" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name=" Key List Right 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvDate" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="InvDate" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="PO_Number Rule" id="5">
+		<func name="Populate Zones Function">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Right 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="PONumber" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 1 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="PONumber" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name=" Key List Right 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="PONumber" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Key List Down 2 Function">
+			<a name="FindKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="PONumber" name="StrParam"/>
+			</a>
+			<a name="GoBelowWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsNumber" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="60" name="StrParam"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Remittance_Zip Rule" id="6">
+		<func name="Copy of Populate Zones Function">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Tax Rule" id="7" qi="">
+		<func name="LastKeyWord First">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Tax" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Copy ofLastKeyWord First" qi="">
+			<a name="FindLastKeyList" ns="Locate" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TAX" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="LastKeyWord Second">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Tax" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="LastKeyWord Last">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Tax" name="StrParam"/>
+			</a>
+			<a name="GoLastWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="LastKeyWord Last-TAX" qi="">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TAX" name="StrParam"/>
+			</a>
+			<a name="GoLastWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Use a zone">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Shipping Rule" id="8">
+		<func name="Shipping Word Find Right 2 Function">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Shipping" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Shipping Word Find Right 2 Function w group">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Shipping" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="GroupWordsLEFT" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="nSpaces"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Shipping Word Find Right 1 Function">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Shipping" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Use a zone">
+			<a name="IsSinglePageDocument" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Detail Rule" id="9">
+		<func name="Called from Verify Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Detail FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="LoadCCOFromField" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetDynamicDetailZones" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Zone Bottom,Notes" name="StrParam"/>
+			</a>
+			<a name="ZoneBOTTOM_ImageBottom" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ScanDetails" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Non-FPXML">
+			<a name="ZoneBOTTOM_ImageBottom" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ZoneRIGHT_ImageRight" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ZoneLEFT_ImageLeft" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ScanDetails" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="LineItem Rule" id="10">
+		<func name="Called From Verify Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ScanLineItemDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="ZoneBottom,Notes" name="StrParam"/>
+			</a>
+		</func>
+		<func name="SinglePage Function">
+			<a name="ScanLineItem" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="ItemID Rule" id="11">
+		<func name="Called From Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Single Page Function">
+			<a name="PopulateZNLineItemField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="ItemDesc Rule" id="12">
+		<func name="Called From Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Single Page Function">
+			<a name="PopulateZNLineItemField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Qty Rule" id="13">
+		<func name="Called From Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Single Page Function">
+			<a name="PopulateZNLineItemField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Price Rule" id="14">
+		<func name="Called From Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Single Page Function">
+			<a name="PopulateZNLineItemField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="LineTotal Rule" id="15">
+		<func name="Called From Function">
+			<a name="IsTaskName" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Verify" name="StrParam"/>
+			</a>
+		</func>
+		<func name="FPXML Function">
+			<a name="FPXMLUsed" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Single Page Function">
+			<a name="PopulateZNLineItemField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Invoice_Total Rule" id="16">
+		<func name="LastKeyWord First">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TotalDue" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="1" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="LastKeyWord Second">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TotalDue" name="StrParam"/>
+			</a>
+			<a name="GoRightWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="2" name="strParam"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="LastKeyWord Last">
+			<a name="FindLastKeyList" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TotalDue" name="StrParam"/>
+			</a>
+			<a name="GoLastWord" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="IsCurrency" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="UpdateField" ns="Locate">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+		<func name="Use a zone">
+			<a name="PopulateZNField" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Set RoutingInstructions" id="17">
+		<func name="Function1">
+			<a name="AssignFieldDefault" ns="Validations">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="None" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Taxes Field Rule" id="18">
+		<func name="Function1">
+			<a name="PopulateTaxType" ns="APTCustom"/>
+		</func>
+	</rule>
+	<rule name="Tax_Value rule" id="19">
+		<func name="Function1">
+			<a name="FindTaxValue" ns="APTCustom"/>
+		</func>
+	</rule>
+	<rule name="PO Num Pos" id="20" qi="">
+		<func name="Function1">
+			<a name="rrSet" ns="rrunner">
+				<p name="varSource" v="0,0,0,0"/>
+				<p name="varTarget" v="@F.Position"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

@@ -1,0 +1,24 @@
+<ruleset name="VScan" id="1" ver="21" modder="admin.1" dt="02/15/12 09:41:05.384 " src_ver="20" qi="">
+	<rule name="VScan" id="1">
+		<func name="VScan: Batch Rule 1">
+			<a name="SetSourceDirectory" ns="vscan">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(vscanimagedir)" name="SmartParam"/>
+			</a>
+			<a name="SetMaxImageFiles" ns="vscan">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="50" name="StrParam"/>
+			</a>
+			<a name="SetMultiPageTiff" ns="vscan">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="Scan" ns="vscan">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

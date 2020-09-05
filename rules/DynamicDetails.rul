@@ -1,0 +1,52 @@
+<ruleset name="DynamicDetails" id="15" ver="5" modder="admin.1" dt="02/09/12 11:31:29.93 " src_ver="4" qi="">
+	<rule name="Page Rule" id="1">
+		<func name="Sticky Function">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VAR(Sticky)"/>
+				<p name="object2" v="No"/>
+			</a>
+			<a name="SkipChildren" ns="rrunner">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Details Rule" id="2">
+		<func name="Get Details Function">
+			<a name="LoadCCOFromField" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetDynamicDetailZones" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Zone Bottom,Notes" name="StrParam"/>
+			</a>
+			<a name="ZoneBOTTOM_ImageBottom" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="ScanDetails" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="LineItem rule" id="3">
+		<func name="scan line item Function">
+			<a name="ScanLineItemDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Zone Bottom,Notes" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Populate LineIte Details Zone Rule" id="4">
+		<func name="Get Values Zone">
+			<a name="PopulateZNLineItemFieldDynamic" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

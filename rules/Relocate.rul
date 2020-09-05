@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset id="33" name="Relocate" ver="11" modder="admin.2" qi="" dt="09/22/14 06:40:35.907 " src_ver="9">
+	<rule name="ItemDesc Rule" id="1" qi="">
+		<func name="Recognize Field OCR">
+			<a name="rrSet" ns="rrunner" qi="">
+				<p name="varSource" v="@B.Temp Language Setting"/>
+				<p name="varTarget" v="@P.s_lg"/>
+			</a>
+			<a name="SetFingerprintRecogPriority" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a ns="Recog_Shared" name="SetOutOfProcessRecogTimeout">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="23"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="25"/>
+			</a>
+			<a name="RecognizeToFileOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions">
+				<p name="FileType" type="int"/>
+			</a>
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="0"/>
+			</a>
+			<a ns="Invoice" name="IncrementBatchVar" qi="">
+				<p type="bInter"/>
+				<p type="bDebug"/>
+				<p type="strParam" v="Field Re-recognized by Operator"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Document Level Rule" id="2">
+		<func name="Multi page Function">
+			<a name="IsMultipageDocument" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="BackupCCO" ns="APTCustom.rrx" qi=""/>
+			<a name="MergeCCOs_ByType" ns="autodoc">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Main_Page,Trailing_Page" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Details Field Rule" id="3" qi="">
+		<func name="Function1">
+			<a name="LoadCCOFromField" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+			<a name="SetEOL" ns="Zones">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" name="bParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

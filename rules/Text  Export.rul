@@ -1,0 +1,84 @@
+<ruleset name="Text  Export" id="8" ver="1">
+	<rule name="Batch level rule" id="1">
+		<func name="Function1">
+			<a name="SetExportPath" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@APPPATH(export)" name="strParam"/>
+			</a>
+			<a name="SetExtensionName" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v=".txt" name="StrParam"/>
+			</a>
+			<a name="SetFileName" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="@BatchID" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+	<rule name="Page level rule" id="2">
+		<func name="Function1">
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice_Number" name="StrParam"/>
+			</a>
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="," name="StrParam"/>
+			</a>
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice_Date" name="StrParam"/>
+			</a>
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="," name="StrParam"/>
+			</a>
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="PO_Number" name="StrParam"/>
+			</a>
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="," name="StrParam"/>
+			</a>
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Invoice_Total" name="StrParam"/>
+			</a>
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="," name="StrParam"/>
+			</a>
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Vendor" name="StrParam"/>
+			</a>
+			<a name="Text" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="," name="StrParam"/>
+			</a>
+			<a name="ExportFieldValue" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="ExportImage" name="StrParam"/>
+			</a>
+			<a name="NewLine" ns="Export">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

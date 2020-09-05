@@ -1,0 +1,394 @@
+﻿<?xml version='1.0' ?>
+<rrx namespace="APT_Localization" v="8.0.2"><i ref="rrunner"/><g>
+  <![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2012 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------  
+  
+'*********************************
+
+' Version
+'  8.0.2 - 04/1/2011   Tom Stuart
+'        - Adding routines to handle commas used as decimal characters.
+'  8.1.1 - 02/15/2012   Tom Stuart
+'        - Fixed small issue with ConvertToLocal
+Version = "8.1.1.2"
+'          Updated 11/09/2013 RFerin Workitem 69384
+'          Deprecated CheckAndFixLocalDecimal - Action functionality unchanged.
+'          Fixed runtime error in IsOriginalEuroFormat if variables are not already initialized.
+'          Added help text to actions.
+'
+'*************************************************
+' LOG VERSION:
+Writelog("APT_Localization Actions " & Version)
+'*************************************************
+
+]]></g>
+
+<f name="IsLocalDecimalSeparator" access="public" qi="Tests the current decimal separator.">
+  <p name="TestChar"/>  
+  <ap>
+     A single character to test as the decimal separator.<br/>
+  </ap>
+  <h>
+     Tests the input decimal separator to see if it matches the default separator of the locale
+     of the current DCO object.  Be aware that the locale for the current DCO object 
+     can be different from the locale of other objects in the hierarchy and different from
+     the locale of the machine running the rules if hr_locale has been set.<br/>
+    <e>
+      <b>IsLocalDecimalSeparator(",")</b><br/>
+      Is_InCharSet("0123456789.,-$")<br/>
+      ConvertToLocalDecimal()<br/>
+    </e>
+  </h>
+  <lvl>
+      Any level.
+  </lvl>
+  <ret>
+    <b>True</b> if the specified character is the current decimal separator.  Otherwise, <b>False.</b>
+  </ret>
+  <g>
+  <![CDATA[
+    
+    localename = DCGlobalLocale.Name(GetLocale())
+    Writelog("Local ID: " & GetLocale() & " Locale Name: " & localename)
+    Writelog("Current Machine separator character: " & DCGlobalCurrency.CurrencyDecimalSeparator(localename) )
+
+    if TestChar = DCGlobalCurrency.CurrencyDecimalSeparator(localename) then
+       IsLocalDecimalSeparator = TRUE       
+    else
+       IsLocalDecimalSeparator = FALSE
+    end if
+
+  ]]>
+  </g>
+</f>
+
+<f name="IsOriginalEuroFormat" access="public" qi="Determines the numeric format used in the document.">  
+  <ap>
+     None.<br/>
+  </ap>
+  <h>
+    Determines if the numeric fields in the document mostly use a comma as a decimal separator or a period as a decimal separator.
+    It is required that ConvertToLocalDecimal has been previously called on all of the numeric fields.
+    <br/>
+    <e>
+      <b>IsOriginalEuroFormat()</b><br/>
+      rrSet("en-GB", "@F.hr_locale")<br/>
+      IsFieldDate()<br/>
+    </e>
+  </h>
+  <lvl>
+     Any level.
+  </lvl>
+  <ret>
+    Returns <b>True</b> if most numerics use a comma as a decimal separator, otherwise <b>False</b> is returned.    
+  </ret>
+  <see>
+    <scr>ConvertToLocalDecimal</scr>
+  </see>
+  <g>
+  <![CDATA[
+    IsOriginalEuroFormat = TRUE       
+
+    Dim oDoc
+    
+    Set oDoc = CurrentObj
+
+    While oDoc.ObjectType > 1
+        Set oDoc = oDoc.Parent
+    wend
+
+   if oDoc.ObjectType = 0 then
+        Writelog("No document object found.  Exiting")
+        Exit Function
+   end if
+
+   if oDoc.Variable("Euro Format") = "" then      
+      oDoc.Variable("Euro Format") = "0"
+   end if
+
+    if oDoc.Variable("USCanUK Format") = "" then
+      oDoc.Variable("USCanUK Format") = "0"
+   end if
+
+   Writelog("Euro Format = " & oDoc.Variable("Euro Format") & ". USCanUK Format = " & oDoc.Variable("USCanUK Format") & ".")
+   if cLng(oDoc.Variable("Euro Format")) < cLng(oDoc.Variable("USCanUK Format")) then
+       IsOriginalEuroFormat = FALSE
+   end if     
+
+  ]]>
+  </g>
+</f>
+
+
+
+<f name="ConvertToLocalDecimal" access="public" qi="Changes numeric formats to use the decimal separator for the current runtime locale.">  
+  <ap>
+     None.<br/>
+  </ap>
+  <h>
+    Updates the current field to use a comma or period decimal separator based on the current locale
+    of the DCO object.  It also counts the decimal separator that was in use prior to the adjustment.<br/><br/>
+    
+    This action requires that if the the numeric field contains a digit grouping symbol, then it must
+    also contain a decimal separator.  It is allowed for the field to contain a decimal separator and no grouping symbol.<br/>
+    <e>
+      Is_InCharSet("0123456789.,-$")<br/>
+      <b>ConvertToLocalDecimal()</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Field level.
+  </lvl>
+  <ret>
+    Always <b>TRUE.</b>
+  </ret>
+  <see>
+    <scr>IsOriginalEuroFormat</scr>
+  </see>
+<g>
+  <![CDATA[
+   Dim oDoc
+   ConvertToLocalDecimal=TRUE
+
+   if Len(CurrentObj.Text) = 0 then
+        Writelog("Blank field. Exiting")
+        Exit Function
+   end if
+
+   Set oDoc = CurrentObj
+
+   While oDoc.ObjectType > 1
+         Set oDoc = oDoc.Parent
+   Wend
+   if oDoc.ObjectType = 0 then
+       Writelog("Document not found.  Exiting")
+       Exit Function
+   end if
+
+   if oDoc.Variable("Euro Format") = "" then
+      oDoc.Variable("Euro Format") = "0"
+   end if
+
+    if oDoc.Variable("USCanUK Format") = "" then
+      oDoc.Variable("USCanUK Format") = "0"
+   end if
+  
+   Writelog("Euro Format = " & oDoc.Variable("Euro Format") & ". USCanUK Format = " & oDoc.Variable("USCanUK Format") & ".")
+   localename = DCGlobalLocale.Name(GetLocale())
+   Writelog("Local ID: " & GetLocale() & " Locale Name: " & localename)
+   Writelog("Current Machine separator character: " & DCGlobalCurrency.CurrencyDecimalSeparator(localename) )
+
+   SeparatorFound = False
+   NumberFound = False
+   For i = Len(CurrentObj.Text) to 1 Step -1
+         Writelog("Testing: " & Mid(CurrentObj.Text,i,1))
+         if InStr(" ,.",Mid(CurrentObj.Text,i,1)) > 0 then
+               if Mid(CurrentObj.Text,i,1) = " " and NumberFound = False then
+                      Writelog("Space found before a valid character found.  Deleting")
+                      CurrentObj.DeleteChild(i-1)
+                else 
+
+                  if SeparatorFound = False then
+                        if CurrentObj.Variable("Locale Checked") <> "Yes" then  ' Only count the first time so we know the original separator
+                           if Mid(CurrentObj.Text,i,1) = "," then    
+                              oDoc.Variable("Euro Format") =   cStr(cLng(oDoc.Variable("Euro Format") ) + 1)
+                              Writelog("Incremented Euro Format")
+                           end if
+
+                           if Mid(CurrentObj.Text,i,1) = "." then 
+                                 oDoc.Variable("USCanUK Format") =   cStr(cLng(oDoc.Variable("USCanUK Format") ) + 1)
+                                 Writelog("Incremented USCanUK Format")
+                            end if
+                       end if
+
+                       CurrentObj.GetChild(i-1).CharValue(0) = AscW(DCGlobalCurrency.CurrencyDecimalSeparator(localename))
+                       Writelog("Separator found, and set to: " & ChrW(CurrentObj.GetChild(i-1).CharValue(0)) )
+                       SeparatorFound = True
+                    CurrentObj.Variable("Locale Checked") = "Yes"
+                  else 
+                        Writelog("Additional Separator found.  Deleting")
+                        CurrentObj.DeleteChild(i-1)
+                  end if
+              end if
+          end if
+          if InStr("0123456789.,-()",Mid(CurrentObj.Text,i,1)) < 1  then
+              Writelog("Non-allowable character found.  Deleting")
+              CurrentObj.DeleteChild(i-1)
+          else
+              NumberFound = TRUE
+              Writelog("Found a valid character")
+          end if
+   Next 'i
+
+   Writelog("Euro Format = " & oDoc.Variable("Euro Format") & ". USCanUK Format = " & oDoc.Variable("USCanUK Format") & ".")
+  ]]>
+  </g>
+</f>
+
+
+<af name="CheckAndFixLocalDecimal" access="public" bInter="bInter" bDebug="bDebug" qi="Checks and fixes issues where the third character from the end is a space or Comma">
+  <ap>None.</ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the FormatNumberToLocale or ConvertFieldToCurrency action in the Validations library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>    
+
+    <b>*** Deprecated Help Description ***</b><br/>    
+    Replaces the space or , with .
+    This can be used to fix errors where the decimal is not recognized and leaves a blank in that area, 
+    also this can be used for conversion for European numbers that use a comma to separate dollars from cents
+    so $100,00 becomes $100.00 or $100 00 becomes $100.00.
+    <e>
+      CheckAndFixLocalDecimal()<br/>
+      Is_InCharSet("0123456789.,-$")<br/>
+      AllowOnlyChars("0123456789.-")<br/>
+      IsFieldCurrency()
+    </e>
+  </h>
+  <lvl>Field level.</lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+<g><![CDATA[
+   Dim oldCOnf
+Dim NewText
+   CheckandFixLocalDecimal = False 
+   If CurrentObj.ObjectType <> 3 then
+      Writelog("Action must be on a field object")
+      Exit Function
+   End if
+   if Len(CurrentObj.Text) < 3  then
+      Writelog("Length is too short for currency.  Exiting FALSE")
+      Exit Function
+   End if
+   Writelog("The Starting value is :" & CurrentObj.Text)
+   oldConf = CurrentObj.ConfidenceString
+
+
+   if Mid(CurrentObj.Text,len(CurrentObj.Text) - 2,1) = " " OR  Mid(CurrentObj.Text,len(CurrentObj.Text) - 2,1) = ","  OR  Mid(CurrentObj.Text,len(CurrentObj.Text) - 2,1) = "." then
+       NewText = Left(CurrentObj.Text,Len(CurrentObj.Text) - 3) & DCGlobalCurrency.CurrencyDecimalSeparator(DCGlobalLocale.Name(GetLocale())) & Right(CurrentObj.Text,2)
+       Writelog("Converting " & CurrentObj.Text & " to " & NewText) 
+       CurrentObj.Text = NewText
+       CurrentObj.ConfidenceString = oldCOnf
+   Else
+     WriteLog("The value of :" & CurrentObj.Text & " doesn't fall in the criteria of a period, space or comma followed by two digits")
+   End if
+
+   CheckAndFixLocalDecimal = TRUE
+
+
+]]></g></af>
+
+
+<af name="IsFieldLocalCurrency" access="public" bInter="bInter" bDebug="bDebug" qi="Checks to see if the field contains a local currency value">
+  <ap>None.</ap>
+  <h>
+    <b>*** This Action Is Deprecated ***</b><br/>
+    This action has been deprecated and is scheduled to be removed in a future release.
+    It is recommended that you no longer use this action.
+    Instead, use the IsFieldCurrency action in the Validations library.
+    <br/><br/>
+    See the action help for details.<br/><br/><br/>
+
+    <b>*** Deprecated Help Description ***</b><br/>
+    Queries the local decimal separator, and checks to see if the value is numeric, and contains two decimal places using the local decimal separator.
+    <e>
+      CheckAndFixLocalDecimal()<br/>
+      Is_InCharSet("0123456789.,-$")<br/>
+      AllowOnlyChars("0123456789.-")<br/>
+      IsFieldLocalCurrency()
+    </e>
+  </h>
+  <lvl>Field level.</lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+<g><![CDATA[
+
+   IsFieldLocalCurrency = True 
+   If CurrentObj.ObjectType <> 3 then
+      Writelog("Action must be on a field object")
+      Exit Function
+   End if
+   Writelog("The value is :" & CurrentObj.Text)
+   if not IsNumeric(CurrentObj.Text) then
+      Writelog("Field is not numeric.  Exiting")
+      IsFieldLocalCurrency = False
+      Exit Function
+   End if
+   if len(CurrentObj.Text) < 3 then
+      Writelog("Value is too short to be a currency.  Exiting")
+      IsFieldLocalCurrency = False
+      Exit Function
+   End if
+    
+   localename = DCGlobalLocale.Name(GetLocale())
+   Writelog("Local ID: " & GetLocale() & " Locale Name: " & localename)
+   Writelog("The current local decimal separator is: " & DCGlobalCurrency.CurrencyDecimalSeparator(localename) )
+   
+   if Mid(CurrentObj.Text,len(CurrentObj.Text) - 2 ,1) <> DCGlobalCurrency.CurrencyDecimalSeparator(localename) then
+         Writelog("Text value for field two spaces from end is " & Mid(CurrentObj.Text,len(CurrentObj.Text) - 2,1) & "  Failing")
+         IsFieldLocalCurrency = False
+   end if
+
+]]></g></af>
+
+<f name="IsWorkstationLocale" access="public" qi="Sample starter RRX Library">
+  <p name="TestLocale"/>
+  
+  <ap>
+     The locale ID you wish to test.<br/>
+  </ap>
+  <h>
+     This action tests to see if the current runtime locale matches the locale specified.
+     The locale specified must be a numeric locale ID as defined by the windows operating system.<br/><br/>
+    
+     The test checks the currently runtime locale set for the current DCO object, which may not be
+     the same as the locale configured on the workstation itself if the locale has been
+     modified with the hr_locale variable.
+    <e>
+      IsWorkstationLocale("1033")<br/>
+      This test checks to see if the current locale is en-US.
+    </e>
+  </h>
+  <lvl>
+      Any level.
+  </lvl>
+  <ret>
+     True if the workstation's locale setting matches the parameter.  False, otherwise.
+  </ret>
+  <see>
+
+  </see>
+  <g>
+  <![CDATA[
+   
+   CurrentLocale = GetLocale()      
+   Writelog("Current workstation locale setting: " & CurrentLocale )
+   
+   if CurrentLocale = TestLocale then
+      IsWorkstationLocale = TRUE
+   else
+      IsWorkstationLocale = FALSE
+   End if
+    
+
+  ]]>
+  </g>
+</f>
+
+</rrx>

@@ -1,0 +1,207 @@
+<?xml version='1.0' ?>
+<rrx namespace="ConcatLineValues" v="8.0.0"><i ref="rrunner"/><g>
+  <![CDATA[
+
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2013 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------
+  
+'*********************************
+'Field Concatination Actions
+'ConcatLineValues.rrx
+
+' Version
+'  8.0.0 - 04/14/2011   Tom Stuart
+'        - Original script to concat line item values
+'
+Version = "8.1.0.0"
+'        - 12/11/2013 RFerin
+'        - 70061 Minor help text changes and consistency.
+'
+Writelog("ConcatLineValues Actions " & Version)
+'*********************************
+
+]]></g>
+
+<f name="MergeLineItemFieldToPageField" access="public" qi="Merges line item values to a page variable">
+  <p name="DetailFieldName"/> 
+  <p name="LineItemFieldName"/>
+  <p name="Delimiter" />
+  <p name="PageFieldName" />
+
+  <ap>
+    <b>DetailFieldName:</b> The name of the field, a direct child of the page, that
+   contains the line items.<br/><br/>
+
+    <b>LineItemFieldName:</b> The name of the field, a grandchild of the DetailField, whose value
+   is to be concatenated in the field specified by PageFieldName.<br/><br/>
+
+    <b>Delimiter:</b> The delimiter character you want to use.<br/><br/>
+
+    <b>PageFieldName</b> The name of a field, a direct child of the page object, that will
+   hold the results.<br/><br/>  
+  </ap>
+  <h>
+         This action will concatenate all of the values of a subfield contained in
+   a detail section and place the values in a field.<br/>
+    <e>
+      <b>MergeLineItemFieldToPageField("Details","Description",",","MyExportField")</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Must be on the page object that contains the detail section and the PageFieldName
+      holder of the concatenated values<br/>
+  </lvl>
+  <ret>    
+    Always <b>True.</b>
+  </ret>
+  <see>    
+    <scr> MergePageFieldToDocVar</scr>
+  </see>
+  <g>
+  <![CDATA[
+  'Your VBScript code goes here.
+
+    MergeLineItemFieldToPageField = TRUE       'Actions must always return a TRUE or FALSE.
+
+Dim oDetail
+Dim oLineItem
+Dim oSourceField
+Dim oDestinationField
+Dim i
+
+ 
+    if CurrentObj.ObjectType <> 2 then
+       Writelog("Action will run on a page object only.  Exiting")
+       Exit Function
+    end if
+
+    Set oDetail = Nothing
+
+    Set oDetail = CurrentObj.FindChild(DetailFieldName)
+
+    If oDetail Is Nothing then
+        Writelog("Could not find detail section.  Exiting")
+        Exit Function
+    end if 
+
+    Set oDestinationField = Nothing
+
+    Set oDestinationField = CurrentObj.FindChild(PageFieldName)
+
+    If oDestinationField Is Nothing then
+        Writelog("Could not find destination field.  Exiting")
+        Exit Function
+    end if 
+    
+
+    For i = 0 to oDetail.NumOfChildren - 1
+        Set oLineItem = oDetail.GetChild(i)
+
+        Set oSourceField = Nothing
+
+        Set oSourceField = oLineItem.FindChild(LineItemFieldName)
+
+        if oSourceField Is Nothing then
+             Writelog("Could not find the " & LineItemFieldName & " field.  Exit")
+             Exit Function
+        End if
+
+        
+        if len(oDestinationField.Text) = 0 then
+            oDestinationField.Text = oSourceField.Text
+        else
+            oDestinationField.Text = oDestinationField.Text & Delimiter & oSourceField.Text
+        end if
+
+     next 'i    
+  ]]>
+  </g>
+</f>
+
+
+
+<f name="MergePageFieldToDocVar" access="public" qi="Merges line item values to a page variable">
+  <p name="PageFieldName"/> 
+  <p name="Delimiter" />
+  <p name="DocumentVariableName" />
+  <ap>
+    <b>PageFieldName:</b> The name of a field, a direct child of the page object, that will
+    hold the results<br/><br/>
+
+    <b>Delimiter:</b> The delimiter character you want to use<br/><br/>
+
+    <b>DocumentVariableName:</b> The name of the field, a grandchild of the DetailField, whose value
+    is to be concatenated in the field specified by PageFieldName<br/><br/> 
+  </ap>
+  <h>
+    This action will concatenate all of the values of a subfield contained in
+    a detail section and place the values in a field<br/>
+    <e>
+      <b>MergeLineItemFieldToPageField("Details",",","MyExportField")</b><br/>
+    </e>
+  </h>
+  <lvl>
+      Must be on the page object that contains the detail section and the PageFieldName
+      holder of the concatenated values<br/>
+  </lvl>
+  <ret>
+    Always <b>True.</b>
+  </ret>
+  <see>    
+    <scr> MergePageFieldToDocVar</scr>
+  </see>
+  <g>
+  <![CDATA[
+  'Your VBScript code goes here.
+
+    MergePageFieldToDocVar = TRUE       'Actions must always return a TRUE or FALSE.
+
+Dim oPage
+Dim oSourceField
+Dim i
+
+ 
+    if CurrentObj.ObjectType <> 1 then
+       Writelog("Action will run on a Document object only.  Exiting")
+       Exit Function
+    end if  
+
+    For i = 0 to CurrentObj.NumOfChildren - 1
+        Set oPage = Nothing
+        if CurrentObj.GetChild(i).ObjectType = 2 then
+           Set oPage = CurrentObj.GetChild(i)
+        end if
+
+        if Not oPage Is Nothing then
+            Set oSourceField = Nothing
+            Set oSourceField = oPage.FindChild(PageFieldName)
+
+            if Not oSourceField Is Nothing then
+
+                if  len(CurrentObj.Variable(DocumentVariableName)) < 1 then
+                   CurrentObj.Variable(DocumentVariableName) = oSourceField.Text
+                else 
+                   CurrentObj.Variable(DocumentVariableName) = CurrentObj.Variable(DocumentVariableName) & Delimiter & oSourceField.Text
+
+                end if
+            end if            
+
+        end if
+    next 'i
+  
+ 
+  ]]>
+  </g>
+</f>
+
+</rrx>

@@ -1,0 +1,18 @@
+<ruleset name="CreateDocs" id="5" ver="1">
+  <rule name="Create Docs" id="1">
+    <func name="CreateDocs: Document Rule 1">
+      <a name="CreateDocuments" ns="DCO">
+        <p type="bInter" name="bInter" />
+        <p type="bDebug" name="bDebug" />
+      </a>
+    </func>
+  </rule>
+  <rule name="Create Fields" id="2">
+    <func name="CreateDocs: Page Rule 1">
+      <a name="CreateFields" ns="DCO">
+        <p type="bInter" name="bInter" />
+        <p type="bDebug" name="bDebug" />
+      </a>
+    </func>
+  </rule>
+</ruleset>

@@ -1,0 +1,311 @@
+<?xml version='1.0' ?>
+<rrx namespace="Intellocate_Learning" v="8.0.1.06"><i ref="rrunner"/>
+  <g>
+    <![CDATA[
+'-----------------------------------------------------------------------------
+' Licensed Materials - Property of IBM
+' “Restricted Materials of IBM”
+' 5725-C15 5725-C69
+'
+' © Copyright IBM Corp. 1994, 2013 All Rights Reserved
+'
+' US Government Users Restricted Rights - Use, duplication or
+' disclosure restricted by GSA ADP Schedule Contract with
+' IBM Corp.
+'
+'-----------------------------------------------------------------------------
+
+'*********************************
+'Intellocate_Learning Actions
+'Intellocate_Learning.rrx
+
+'  Version
+'  8.0.0.0 - Tom Stuart
+'  8.0.0.1 - Tom Stuart
+'          - Fixed Line Item Issue  
+'  8.0.0.2 - Tom Stuart
+'            Fixed POS- Variable issue 
+'  8.0.4.0 - 07/26/10 29016 Changed Pre-Verify variable references to PreVerify       
+'  8.0.5   - 07/30/10 RFerin & Tom Stuart
+'          - Added to make the XML format more compliant and help with editing.  Requires buildvbs.rls 1.0.2.2.
+'          - 28188 Added help text to Learn_Zones.
+Version = "8.0.1.06"
+' Updated 01/07/2011 PHofle
+' * Removed file extension name (extn) from <i ref="namespace.extn"> tags, just uses namespace for use
+'   with TM8.01 locale RRS. Now looks like <i ref="namespace">.
+'
+Writelog("Intellocate_Learning Actions " & Version)
+
+'*********************************
+
+Dim NeedDCOWrite
+
+]]></g>
+<af name="Learn_ZonesFPX" access="public" bInter="bInter" bDebug="bDebug" qi="Adds new zones to the DCO.">
+  <ap>
+    None.
+  </ap>
+  <lvl>Page level.</lvl>
+  <ret>
+    <b>False,</b> if the FPXML does not need to be rewritten  Otherwise, <b>True.</b>
+  </ret>
+  <h>
+    This actions has the capability to learn new zones based on a variable setting.
+    A variable "PreVerify Pos" with a value of "0,0,0,0" indicates that there wasn't
+    previously a zone and will be added to the DCO.<br/><br/>
+    This action is FPXML compatible.  This action only learns the first line item.
+
+    Note, this action needs to be followed by WriteZonesFPX to write the zones to FPXML
+    
+    <e>
+      <b>Learn_ZonesFPX()</b>
+    </e>
+  </h>
+<g><![CDATA[
+Dim oSetup
+
+   Learn_ZonesFPX = TRUE
+
+
+   if uCase(CurrentObj.Variable("Sticky")) = "YES" then
+      Writelog("Sticky fingerprint encountered.  Exiting")
+      Exit Function
+   end if
+
+   Set oSetup = CurrentObj.SetupObject
+
+   If(oSetup Is Nothing) Then
+      writelog("Can not get SetupObject from currentObj")
+      Exit Function
+   Else
+      writelog("Setup Object is received. SetupObj has path" & vbCrLf & oSetup.Path)
+   End If
+
+   if CurrentObj.Variable("Image_Offset") = "" then
+      Writelog("Image_Offset was blank.  Setting to (0,0)")
+      CurrentObj.Variable("Image_Offset") = "0,0"
+   end if
+
+   
+   OffsetAr= Split(CurrentObj.Variable("Image_Offset"),",")
+   x = cLng(OffsetAr(0))
+   y = cLng(OffsetAr(1))
+
+   Writelog("TemplateID: " & CurrentObj.Variable("TemplateID"))
+   Writelog("x: " & cStr(x))
+   Writelog("y: " & cStr(y))
+   
+   NeedDCOWrite = FALSE
+
+   'Fix Line Item Issue   
+   Dim oDetails
+   Dim oLineItem
+
+   Set oDetails = CurrentObj.FindChild("Details")
+
+   if oDetails.NumOfChildren > 0 then
+      For i = 0 to oDetails.NumOfChildren - 1
+         Set oLineItem = oDetails.GetChild(i)
+
+         if oDetails.GetChild(0).Variable("PreVerify Pos") = "" then
+            oDetails.Variable("PreVerify Pos") = "0,0,0,0"
+            Writelog("Marking Details zone for save")
+         end if
+
+
+
+         if i = 0 then
+                if oDetails.Variable("LineItemPos") <> "" then
+                   oLineItem.Variable("Position") = oDetails.Variable("LineItemPos")
+                End if
+                for j = 0 to oLineItem.NumOfChildren - 1
+                   Writelog("Processing: " &  oLineItem.GetChild(j).ID)
+                   if oDetails.Variable("POS-" & cStr(oLineItem.GetChild(j).ID)) <> "" then
+                      Writelog("Using FindDetails position")
+                      oLineItem.GetChild(j).Variable("Position") = oDetails.Variable("POS-" & oLineItem.GetChild(j).ID) 
+                   end if      
+                next 'j           
+
+         else
+            oLineItem.Variable("PreVerify Pos") = oLineItem.Variable("Position")
+            for j = 0 to oLineItem.NumOfChildren - 1
+                oLineItem.GetChild(j).Variable("PreVerify Pos") = oLineItem.GetChild(j).Variable("Position")          
+            next 'j
+         end if
+     Next 'i
+   End if
+   
+   Call RecurseObject(oSetup,CurrentObj.Variable("TemplateID"),CurrentObj,x,y)
+
+   if NeedDCOWrite = FALSE then
+      Writelog("Did not detect any updated fields.  Exiting")
+      Learn_ZonesFPX=FALSE
+      Exit Function
+   End if
+
+
+ 
+
+]]></g>   
+   
+
+
+  
+</af><af name="Learn_Zones" access="public" bInter="bInter" bDebug="bDebug" qi="Adds new zones to the DCO.">
+  <ap>
+    None.
+  </ap>
+  <lvl>Page level.</lvl>
+  <ret>
+    <b>False,</b> if the setup DCO could not be saved to disk.  Otherwise, <b>True.</b>
+  </ret>
+  <h>
+    This actions has the capability to learn new zones based on a variable setting.
+    A variable "PreVerify Pos" with a value of "0,0,0,0" indicates that there wasn't
+    previously a zone and will be added to the DCO.<br/><br/>
+    This action is not FPXML compatible.  This action only learns the first line item.
+    <e>
+      <b>Learn_Zones()</b>
+    </e>
+  </h>
+<g><![CDATA[
+Dim oSetup
+
+   Learn_Zones = TRUE
+
+
+   if uCase(CurrentObj.Variable("Sticky")) = "YES" then
+      Writelog("Sticky fingerprint encountered.  Exiting")
+      Exit Function
+   end if
+
+   Set oSetup = CurrentObj.SetupObject
+
+   If(oSetup Is Nothing) Then
+      writelog("Can not get SetupObject from currentObj")
+      Exit Function
+   Else
+      writelog("Setup Object is received. SetupObj has path" & vbCrLf & oSetup.Path)
+   End If
+
+   if CurrentObj.Variable("Image_Offset") = "" then
+      Writelog("Image_Offset was blank.  Setting to (0,0)")
+      CurrentObj.Variable("Image_Offset") = "0,0"
+   end if
+
+   
+   OffsetAr= Split(CurrentObj.Variable("Image_Offset"),",")
+   x = cLng(OffsetAr(0))
+   y = cLng(OffsetAr(1))
+
+   Writelog("TemplateID: " & CurrentObj.Variable("TemplateID"))
+   Writelog("x: " & cStr(x))
+   Writelog("y: " & cStr(y))
+   
+   NeedDCOWrite = FALSE
+
+   'Fix Line Item Issue   
+   Dim oDetails
+   Dim oLineItem
+
+   Set oDetails = CurrentObj.FindChild("Details")
+
+   if oDetails.NumOfChildren > 0 then
+      For i = 0 to oDetails.NumOfChildren - 1
+         Set oLineItem = oDetails.GetChild(i)
+
+         if oDetails.GetChild(0).Variable("PreVerify Pos") = "" then
+            oDetails.Variable("PreVerify Pos") = "0,0,0,0"
+            Writelog("Marking Details zone for save")
+         end if
+
+
+
+         if i = 0 then
+                if oDetails.Variable("LineItemPos") <> "" then
+                   oLineItem.Variable("Position") = oDetails.Variable("LineItemPos")
+                End if
+                for j = 0 to oLineItem.NumOfChildren - 1
+                   Writelog("Processing: " &  oLineItem.GetChild(j).ID)
+                   if oDetails.Variable("POS-" & cStr(oLineItem.GetChild(j).ID)) <> "" then
+                      Writelog("Using FindDetails position")
+                      oLineItem.GetChild(j).Variable("Position") = oDetails.Variable("POS-" & oLineItem.GetChild(j).ID) 
+                   end if      
+                next 'j           
+
+         else
+            oLineItem.Variable("PreVerify Pos") = oLineItem.Variable("Position")
+            for j = 0 to oLineItem.NumOfChildren - 1
+                oLineItem.GetChild(j).Variable("PreVerify Pos") = oLineItem.GetChild(j).Variable("Position")          
+            next 'j
+         end if
+     Next 'i
+   End if
+   
+   Call RecurseObject(oSetup,CurrentObj.Variable("TemplateID"),CurrentObj,x,y)
+
+   if NeedDCOWrite = FALSE then
+      Writelog("Did not detect any updated fields.  Exiting")
+      Exit Function
+   End if
+
+   If oSetup.WriteSetup(oSetup.path)  Then
+      writelog("Saved Setup DCO - " & oSetup.Path)
+   Else
+      writelog("Failed to save setup DCO")
+      Learn_Zones = False  
+   end if
+
+
+ 
+]]></g>
+
+</af><f name="RecurseObject" access="private"><p name="oSetup"/><p name="TemplateID"/><p name="oObj"/><p name="x"/><p name="y"/>
+<h><![CDATA[utility function for ProcessChildren Action]]></h>
+<g><![CDATA[
+	Dim i
+        Dim oSetupField
+
+  
+        Dim nChildren
+        
+        if oObj.Variable("PreVerify Pos") = "" AND oObj.ObjectType = 3  then
+           oObj.Variable("PreVerify Pos") = "0,0,0,0"
+           writelog("fixed blank variable")
+        end if
+  
+        If oObj.Variable("PreVerify Pos") = "0,0,0,0" AND oObj.Variable("Position") <> "0,0,0,0" then
+           Writelog("Learning Zone For: " & oObj.ID)
+           NeedDCOWrite = TRUE
+            Set oSetupField = oSetup.GetNodeByName(3,oObj.Type)
+            Dim PosAr
+            Writelog(" Field Position:" & oObj.Variable("Position"))
+            PosAr = Split(oObj.Variable("Position"),",")
+            WRitelog("x: " & cStr(x) & "      y: "  & cStr(y))
+            NewPos = oObj.Variable("Position")
+            if x<>0 OR y <> 0 then
+       
+               PosAr(0) = cStr(cLng(PosAr(0)) + x)
+               PosAr(1) = cStr(cLng(PosAr(1)) + y)
+               PosAr(2) = cStr(cLng(PosAr(2)) + x)
+               PosAr(3) = cStr(cLng(PosAr(3)) + y)
+
+               NewPos=PosAr(0) & "," & PosAr(1) & "," & PosAr(2) & "," & PosAr(3)
+            end if
+            Writelog("NewPos: " & NewPos)   
+
+           oSetupField.Variable("Pos" & CurrentObj.Variable("TemplateID")) =  NewPos
+
+
+           Writelog("     Pos" & CurrentObj.Variable("TemplateID") & " - " & oObj.Variable("Position"))
+       End if
+
+  
+  'Count of child objects -  character obj count
+  nChildren = oObj.NumOfChildren - len(oObj.Text)
+
+  For i = 1 to nChildren
+    Call RecurseObject(oSetup,TemplasteID,oObj.GetChild(i-1),x,y)
+  Next 'i
+
+]]></g></f></rrx>

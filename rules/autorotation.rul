@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="AutoRotation" id="2" ver="6" modder="admin.2" dt="09/22/14 05:24:06.442 " src_ver="2" qi="">
+	<rule name="Managed Auto Rotation Rule" id="2" qi="">
+		<func name="Perform First Pass Function">
+			<a name="RecogContinueOnFailure" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="StrParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="25" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="20"/>
+			</a>
+			<a name="RotateImageOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions"/>
+			<a ns="rrunner" name="rrCompare">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="2"/>
+			</a>
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation Success First Pass" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Managed Auto  Rotation failure" qi="">
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="FALSE" name="strParam"/>
+			</a>
+			<a name="UseOutOfProcessRecog" ns="Recog_Shared">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="TRUE" name="strParam"/>
+			</a>
+			<a name="SetOutOfProcessRecogTimeout" ns="Recog_Shared" qi="">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="185" name="StrParam"/>
+			</a>
+			<a ns="com:Datacap.Libraries.ScansoftR.Actions" name="SetEngineTimeoutOCR_S">
+				<p name="Seconds" type="int" v="180"/>
+			</a>
+			<a name="RotateImageOCR_S" ns="com:Datacap.Libraries.ScansoftR.Actions"/>
+			<a ns="rrunner" name="rrCompare">
+				<p name="object1" v="@P.RecogStatus"/>
+				<p name="object2" v="2"/>
+			</a>
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation Success Second Pass" name="StrParam"/>
+			</a>
+		</func>
+		<func name="Rotation Failue">
+			<a ns="Invoice" name="IncrementBatchVar">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v="Rotation Failue" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>

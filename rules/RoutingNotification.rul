@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ruleset name="RoutingNotification" id="24" ver="3" modder="admin.1" dt="11/06/13 13:12:56.253 " src_ver="2" qi="">
+	<rule name="Send Outlook Notification" id="2">
+		<func name="Function1">
+			<a name="rrCompare" ns="rrunner">
+				<p name="object1" v="@VALUE"/>
+				<p name="object2" v="None"/>
+			</a>
+		</func>
+		<func name="Function2">
+			<a name="SendOutlookNotification" ns="Invoice">
+				<p type="bInter" name="bInter"/>
+				<p type="bDebug" name="bDebug"/>
+				<p type="strParam" v=".pdf" name="StrParam"/>
+			</a>
+		</func>
+	</rule>
+</ruleset>
