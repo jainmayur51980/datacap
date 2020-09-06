@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<S>
+  <P type="Main_Page">
+    <V n="HostName">Busy Car Repair</V>
+    <V n="HostID">234</V>
+    <F type="Invoice_Number">
+      <V n="Position">1519,805,1620,839</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">1519,844,1645,884</V>
+    </F>
+    <F type="PO_Number">
+      <V n="Position">429,1359,625,1408</V>
+    </F>
+    <F type="Remittance_Zip">
+      <V n="Position">1555,3041,1742,3076</V>
+    </F>
+    <F type="Tax">
+      <V n="Position">2284,2136,2386,2170</V>
+    </F>
+    <F type="Shipping">
+      <V n="Position">2283,2210,2388,2245</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1607,2565,3305</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2261,2360,2388,2395</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1608,2565,1652</V>
+    </F>
+    <F type="ItemID">
+      <V n="Position">376,1608,494,1643</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2268,1612,2393,1647</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">139,1608,179,1643</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">845,1613,1465,1652</V>
+    </F>
+    <F type="Price">
+      <V n="Position">2024,1611,2129,1646</V>
+    </F>
+  </P>
+</S>

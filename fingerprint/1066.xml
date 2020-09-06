@@ -1,0 +1,52 @@
+<S>
+  <P type="Main_Page">
+    <V n="HostID">
+    </V>
+    <V n="HostName">Stuart Apothecary</V>
+    <F type="Remittance_Zip">
+      <V n="Position">1418,484,1525,519</V>
+    </F>
+    <F type="Invoice_Number">
+      <V n="Position">1959,696,2106,730</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">1959,743,2137,786</V>
+    </F>
+    <F type="PO_Number">
+      <V n="Position">1959,798,2086,831</V>
+    </F>
+    <F type="Shipping">
+      <V n="Position">2083,2727,2197,2761</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2062,2778,2199,2811</V>
+    </F>
+    <F type="Page_No">
+      <V n="Position">90,90,210,210</V>
+    </F>
+    <F type="TIFF">
+      <V n="Position">100,100,200,200</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1272,2479,7016</V>
+    </F>
+    <F type="ItemID">
+      <V n="Position">1456,1273,1621,1310</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">494,1283,1286,1323</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">274,1283,395,1319</V>
+    </F>
+    <F type="Price">
+      <V n="Position">1818,1273,1949,1310</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2064,1273,2196,1310</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1273,2479,1323</V>
+    </F>
+  </P>
+</S>

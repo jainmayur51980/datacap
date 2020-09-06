@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<S>
+  <P type="Main_Page">
+    <V n="HostName">XYZ Hardware</V>
+    <V n="HostID">233</V>
+    <F type="Invoice_Number">
+      <V n="Position">2184,452,2340,486</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">2194,496,2340,536</V>
+    </F>
+    <F type="PO_Number">
+      <V n="Position">689,1353,798,1390</V>
+    </F>
+    <F type="Remittance_Zip">
+      <V n="Position">589,344,717,388</V>
+    </F>
+    <F type="Tax">
+      <V n="Position">2195,2431,2311,2474</V>
+    </F>
+    <F type="Shipping">
+      <V n="Position">2104,2519,2352,2558</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1570,2552,3295</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2170,2590,2311,2634</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1571,2552,1628</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2177,1571,2315,1615</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">138,1576,159,1618</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">534,1579,1652,1628</V>
+    </F>
+    <F type="Price">
+      <V n="Position">1824,1572,1962,1616</V>
+    </F>
+  </P>
+</S>

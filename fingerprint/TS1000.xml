@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<S>
+  <P type="Main_Page">
+    <V n="HostName">Stuart Apothecary</V>
+    <V n="HostID">232</V>
+    <F type="Invoice_Number">
+      <V n="Position">2039,211,2159,250</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">2039,768,2205,808</V>
+    </F>
+    <F type="Remittance_Zip">
+      <V n="Position">546,505,770,544</V>
+    </F>
+    <F type="Tax">
+      <V n="Position">2250,2119,2380,2159</V>
+    </F>
+    <F type="Shipping">
+      <V n="Position">2172,2066,2415,2110</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1095,2552,3295</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2224,2230,2380,2269</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1096,2552,1150</V>
+    </F>
+    <F type="ItemID">
+      <V n="Position">430,1104,603,1143</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2226,1099,2382,1139</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">196,1104,215,1143</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">695,1096,1579,1150</V>
+    </F>
+    <F type="Price">
+      <V n="Position">1846,1100,2002,1140</V>
+    </F>
+  </P>
+</S>

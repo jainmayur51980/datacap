@@ -1,0 +1,57 @@
+<S>
+  <P type="Main_Page">
+    <V n="HostID">245</V>
+    <V n="HostName">Yellow Insurance Company</V>
+    <F type="Remittance_Zip">
+      <V n="Position">1661,3006,1750,3034</V>
+    </F>
+    <F type="Invoice_Number">
+      <V n="Position">1500,791,1594,820</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">1500,834,1614,862</V>
+    </F>
+    <F type="PO_Number">
+      <V n="Position">424,1347,546,1380</V>
+    </F>
+    <F type="Tax">
+      <V n="Position">2248,2108,2345,2140</V>
+    </F>
+    <F type="Shipping">
+      <V n="Position">2248,2178,2349,2211</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2228,2319,2349,2351</V>
+    </F>
+    <F type="Page_No">
+      <V n="Position">90,90,210,210</V>
+    </F>
+    <F type="TIFF">
+      <V n="Position">100,100,200,200</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1587,2555,3305</V>
+    </F>
+    <F type="ItemID">
+      <V n="Position">366,1588,491,1625</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">834,1595,1563,1633</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">134,1588,179,1625</V>
+    </F>
+    <F type="Price">
+      <V n="Position">1973,1588,2086,1625</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2218,1588,2351,1625</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1588,2555,1633</V>
+    </F>
+    <F type="Tax_Value">
+      <V n="Position">2252,2112,2341,2136</V>
+    </F>
+  </P>
+</S>

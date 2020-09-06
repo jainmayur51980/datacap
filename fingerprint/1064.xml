@@ -1,0 +1,55 @@
+<S>
+  <P type="Main_Page">
+    <V n="HostID">
+    </V>
+    <V n="HostName">Busy Car Repair</V>
+    <F type="Remittance_Zip">
+      <V n="Position">567,652,680,688</V>
+    </F>
+    <F type="Invoice_Number">
+      <V n="Position">2176,456,2274,485</V>
+    </F>
+    <F type="Invoice_Date">
+      <V n="Position">2113,510,2268,539</V>
+    </F>
+    <F type="PO_Number">
+      <V n="Position">580,1234,705,1268</V>
+    </F>
+    <F type="Tax">
+      <V n="Position">2171,2481,2256,2512</V>
+    </F>
+    <F type="Invoice_Total">
+      <V n="Position">2139,2561,2254,2589</V>
+    </F>
+    <F type="Page_No">
+      <V n="Position">90,90,210,210</V>
+    </F>
+    <F type="TIFF">
+      <V n="Position">100,100,200,200</V>
+    </F>
+    <F type="Details">
+      <V n="Position">0,1442,2555,3305</V>
+    </F>
+    <F type="ItemID">
+      <V n="Position">451,1443,511,1480</V>
+    </F>
+    <F type="ItemDesc">
+      <V n="Position">673,1455,1593,1493</V>
+    </F>
+    <F type="Qty">
+      <V n="Position">227,1443,270,1480</V>
+    </F>
+    <F type="Price">
+      <V n="Position">1669,1443,1765,1480</V>
+    </F>
+    <F type="LineTotal">
+      <V n="Position">2137,1443,2251,1480</V>
+    </F>
+    <F type="Lineitem">
+      <V n="Position">0,1443,2555,1493</V>
+    </F>
+    <F type="Tax_Value">
+      <V n="Position">2175,2485,2252,2508</V>
+    </F>
+  </P>
+</S>
